@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrovest</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header">
+            <img src="images/AgroVest.png" alt="Agrovest Logo">
+            <div class="menu">
+              <p>Menu</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Tell Us More About You</h1>
+        <p>This information helps us provide you with personalized experience.</p>
+        <form>
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="Placeholder" required>
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" required>
+            </div>
+            <div class="form-group">
+                <label for="crop">Crop you Plant</label>
+                <select id="crop" required>
+                    <option value="Yam">Yam</option>
+                    <option value="Beans">Beans</option>
+                    <option value="Rice">Rice</option>
+                    <option value="Potatoes">Potatoes</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="farmAddress">What Is Your Farm Address?</label>
+                <input type="text" id="farmAddress" placeholder="Placeholder" required>
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" placeholder="Placeholder" required>
+            </div>
+            <div class="form-group">
+                <label for="state">State</label>
+                <select id="state" required>
+                    <option value="Abia">Abia</option>
+                    <option value="Akwa Ibom">Akwa Ibom</option>
+                    <option value="Anambra">Anambra</option>
+                </select>
+            </div>
+            <button type="submit">Create Profile</button>
+        </form>
+    </div>
+</body>
+</html>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #1b472a;
+    padding: 10px 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    max-width: 90%;
+    margin-top: 20px;
+}
+
+h1 {
+    color: #28a745;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.menu p {
+    color: #ffffff;
+    font-size: 1.2em;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end; /* Align to the right */
+    text-align: right;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="date"], select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #28a745;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+</style>
