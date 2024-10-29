@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agrovest Login</title>
+    <title>Agrovest Sign Up</title>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
       rel="stylesheet"
@@ -16,7 +16,7 @@
         color: #1b4d2e;
       }
       @media (min-width: 768px) {
-        .login-container {
+        .signup-container {
           max-width: 480px;
         }
       }
@@ -65,18 +65,42 @@
     </nav>
 
     <main class="container mx-auto px-4 mt-8">
-      <div class="login-container mx-auto">
+      <div class="signup-container mx-auto">
         <div class="flex justify-center mb-6">
           <div
             class="rounded-full bg-gray-100 p-2 w-24 h-24 flex items-center justify-center"
           >
-            <img src="images/red.png" alt="Farmer Avatar" class="w-20 h-20" />
+            <img src="images/blue.png" alt="Farmer Avatar" class="w-20 h-20" />
           </div>
         </div>
-        <h1 class="text-2xl font-bold text-center mb-8">Log in</h1>
+        <h1 class="text-2xl font-bold text-center mb-8">Sign up</h1>
         <div id="alert-container"></div>
 
-        <form id="loginForm" class="space-y-6">
+        <form id="signupForm" class="space-y-6">
+          <button
+            type="button"
+            id="googleSignIn"
+            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
+          >
+            <img src="images/google.png" alt="Google Logo" class="w-6 h-6" />
+            <span>Sign up with Google</span>
+          </button>
+          <button
+            type="button"
+            id="facebookSignIn"
+            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
+          >
+            <img
+              src="images/facebook.png"
+              alt="Facebook Logo"
+              class="w-6 h-6"
+            />
+            <span>Sign up with Facebook</span>
+          </button>
+          <div class="or-divider">
+            <span class="text-center text-gray-500">OR</span>
+          </div>
+
           <div>
             <label for="email" class="block text-gray-700 font-bold mb-2"
               >Email</label
@@ -109,37 +133,13 @@
             id="submitButton"
             class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90"
           >
-            Log In
-          </button>
-          <div class="or-divider">
-            <span class="text-center text-gray-500">OR</span>
-          </div>
-
-          <button
-            type="button"
-            id="googleSignIn"
-            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
-          >
-            <img src="images/google.png" alt="Google Logo" class="w-6 h-6" />
-            <span>Sign in with Google</span>
-          </button>
-          <button
-            type="button"
-            id="facebookSignIn"
-            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
-          >
-            <img
-              src="images/facebook.png"
-              alt="Facebook Logo"
-              class="w-6 h-6"
-            />
-            <span>Sign in with Facebook</span>
+            Sign Up
           </button>
         </form>
         <div id="alert-container"></div>
         <p class="text-center mt-4">
-          <a href="signup.html" class="text-agrovest-text-green hover:underline"
-            >Don't have an account? Sign up</a
+          <a href="login.html" class="text-agrovest-text-green hover:underline"
+            >Already have an account? Log in</a
           >
         </p>
       </div>
@@ -151,9 +151,10 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import {
         getAuth,
-        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
         GoogleAuthProvider,
         signInWithPopup,
+        sendEmailVerification,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
       const firebaseConfig = {
@@ -223,23 +224,32 @@
         }
 
         try {
-          const userCredential = await signInWithEmailAndPassword(
+          const userCredential = await createUserWithEmailAndPassword(
             auth,
             email,
             password
           );
           const user = userCredential.user;
-          if (user.emailVerified) {
-            window.location.href = "home.html";
-          } else {
-            showAlert(
-              "warning",
-              "Please verify your email address before logging in."
-            );
-            console.log("unverifiied user");
-          }
+          console.log("User created:", user);
+          showAlert(
+            "success",
+            "Sign up successful! Please check your email for verification."
+          );
+
+          // Send email verification
+          await sendEmailVerification(user);
+
+          // Redirect to login page
+          window.location.href = "login.html";
         } catch (error) {
-          console.error("Error signing in:", error);
+          console.error("Error creating user:", error);
+          if (error.code === "auth/email-already-in-use") {
+            emailError.textContent = "Email already in use.";
+          } else if (error.code === "auth/weak-password") {
+            passwordError.textContent = "Password too weak.";
+          } else {
+            showAlert("danger", error.message);
+          }
         }
       });
 
@@ -259,25 +269,14 @@
 
       window.fbAsyncInit = function () {
         FB.init({
-          appId: "YOUR_FACEBOOK_APP_ID",
+          appId: "YOUR_FACEBOOK_APP_ID", // Replace with your Facebook App ID
           cookie: true,
           xfbml: true,
           version: "v17.0",
         });
 
         facebookSignInButton.addEventListener("click", function () {
-          FB.login(
-            function (response) {
-              if (response.authResponse) {
-                console.log("Facebook login successful", response);
-                window.location.href = "home.html";
-              } else {
-                console.log("Facebook login cancelled");
-                showAlert("danger", "Facebook login cancelled.");
-              }
-            },
-            { scope: "email" }
-          );
+          showAlert("warning", "Facebook sign-up is currently unavailable.");
         });
       };
 
