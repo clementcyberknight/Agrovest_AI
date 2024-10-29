@@ -94,6 +94,16 @@
       .intl-tel-input .country-list .country .country-name {
         font-size: 14px;
       }
+
+      /* Improve form styling */
+      form {
+        width: 100%;
+      }
+
+      .error-message {
+        color: red;
+        margin-top: 5px;
+      }
     </style>
   </head>
   <body class="bg-white min-h-screen">
@@ -140,7 +150,9 @@
               class="w-full p-3 pl-20 border rounded-lg"
               placeholder="Phone Number"
             />
+            <span id="phone-error" class="error-message"></span>
           </div>
+
           <button
             type="submit"
             class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90"
@@ -156,6 +168,7 @@
               class="w-full p-3 border rounded-lg"
               placeholder="Verification Code"
             />
+            <span id="code-error" class="error-message"></span>
             <div
               class="g-recaptcha"
               data-sitekey="6LedjW8qAAAAAOQizxfjXiN5JkT_Y6jjCTxeKANT"
@@ -195,6 +208,7 @@
       };
 
       let recaptchaVerifier;
+      let verificationId;
 
       function onloadCallback() {
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier("phone", {
@@ -209,7 +223,8 @@
         "verification-section"
       );
       const verifyCodeButton = document.getElementById("verifyCodeButton");
-      let verificationId;
+      const phoneError = document.getElementById("phone-error");
+      const codeError = document.getElementById("code-error");
 
       // Google Sign-In
       const googleProvider = new firebase.auth.GoogleAuthProvider();
@@ -232,22 +247,29 @@
       const phoneInput = window.intlTelInput(phoneInputField, {
         utilsScript:
           "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-        initialCountry: "ng", // Set initial country to Nigeria
+        initialCountry: "ng",
         geoIpLookup: function (success, failure) {
-          success("ng"); // Always return Nigeria
+          success("ng");
         },
         preferredCountries: ["ng", "gh", "gb", "us"],
-        onlyCountries: ["ng", "gh", "gb", "us"], // Limit options to these countries
-        separateDialCode: true, // Ensure dial code is always visible
+        onlyCountries: ["ng", "gh", "gb", "us"],
+        separateDialCode: true,
       });
 
       // Phone Number Verification
       document.getElementById("signupForm").addEventListener("submit", (e) => {
         e.preventDefault();
+
+        phoneError.textContent = "";
         const phoneNumber = phoneInput.getNumber();
 
+        if (!phoneNumber || !phoneInput.isValidNumber()) {
+          phoneError.textContent = "Please enter a valid phone number.";
+          return;
+        }
+
         auth
-          .signInWithPhoneNumber(phoneNumber, recaptchaVerifier) // Pass recaptchaVerifier
+          .signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
           .then((confirmationResult) => {
             verificationId = confirmationResult.verificationId;
             console.log("Verification ID:", verificationId);
@@ -255,15 +277,25 @@
           })
           .catch((error) => {
             console.error("Error during phone number verification:", error);
+            phoneError.textContent =
+              "Failed to verify phone number. Please try again.";
           });
       });
 
       verifyCodeButton.addEventListener("click", () => {
+        codeError.textContent = "";
         const code = document.getElementById("verificationCode").value;
+
+        if (!code) {
+          codeError.textContent = "Please enter the verification code.";
+          return;
+        }
+
         const credential = firebase.auth.PhoneAuthProvider.credential(
           verificationId,
           code
         );
+
         auth
           .signInAndRetrieveDataWithCredential(credential)
           .then((result) => {
@@ -273,6 +305,8 @@
           })
           .catch((error) => {
             console.error("Error verifying code:", error);
+            codeError.textContent =
+              "Invalid verification code. Please try again.";
           });
       });
     </script>
