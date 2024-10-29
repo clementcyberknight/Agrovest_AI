@@ -1,80 +1,280 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agrovest Sign Up</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
+    />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
-        .agrovest-green {
-            background-color: #1B4D2E;
+      .agrovest-green {
+        background-color: #1b4d2e;
+      }
+      .agrovest-text-green {
+        color: #1b4d2e;
+      }
+      @media (min-width: 768px) {
+        .signup-container {
+          max-width: 480px;
         }
-        .agrovest-text-green {
-            color: #1B4D2E;
-        }
-        @media (min-width: 768px) {
-            .signup-container {
-                max-width: 480px;
-            }
-        }
+      }
+
+      /* Style the phone input */
+      .intl-tel-input {
+        position: relative;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 8px 10px;
+        font-size: 16px;
+      }
+
+      .intl-tel-input .selected-flag {
+        width: 32px;
+        height: 32px;
+        margin-right: 8px;
+        border-radius: 50%;
+        overflow: hidden;
+      }
+
+      .intl-tel-input .selected-flag img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .intl-tel-input .country-list {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: absolute;
+        z-index: 10;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 8px;
+      }
+
+      .intl-tel-input .country-list .country {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+      }
+
+      .intl-tel-input .country-list .country:last-child {
+        border-bottom: none;
+      }
+
+      .intl-tel-input .country-list .country .flag {
+        width: 32px;
+        height: 32px;
+        margin-right: 8px;
+        border-radius: 50%;
+        overflow: hidden;
+      }
+
+      .intl-tel-input .country-list .country .flag img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .intl-tel-input .country-list .country .country-name {
+        font-size: 14px;
+      }
     </style>
-</head>
-<body class="bg-white min-h-screen">
+  </head>
+  <body class="bg-white min-h-screen">
     <nav class="agrovest-green p-4 flex justify-between items-center">
-        <div class="flex items-center">
-            <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-24">
-            <span class="text-yellow-100 ml-4 text-xl hidden md:inline">Home</span>
-        </div>
+      <div class="flex items-center">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-24" />
+      </div>
+      <a
+        href="/"
+        class="text-yellow-100 text-center text-xl hidden inline md:inline"
+        >Home</a
+      >
     </nav>
 
-    <!-- Main Content -->
     <main class="container mx-auto px-4 mt-8">
-        <div class="signup-container mx-auto">
-            <!-- Avatar -->
-            <div class="flex justify-center mb-6">
-                <div class="rounded-full bg-gray-100 p-2 w-24 h-24 flex items-center justify-center">
-                    <img src="/api/placeholder/80/80" alt="Farmer Avatar" class="w-20 h-20">
-                </div>
-            </div>
-
-            <!-- Sign Up Text -->
-            <h1 class="text-2xl font-bold text-center mb-8">Sign up</h1>
-
-            <!-- Sign Up Form -->
-            <form id="signupForm" class="space-y-6">
-                <!-- Google Sign Up Button -->
-                <button type="button" class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50">
-                    <img src="/api/placeholder/24/24" alt="Google Logo" class="w-6 h-6">
-                    <span>Sign up with Google</span>
-                </button>
-
-                <div class="text-center text-gray-500">OR</div>
-
-                <!-- Phone Number Input -->
-                <div class="relative">
-                    <select class="absolute left-3 top-1/2 transform -translate-y-1/2 border-r pr-2" id="countryCode">
-                        <option value="+1">+1</option>
-                    </select>
-                    <input type="tel" class="w-full p-3 pl-16 border rounded-lg" placeholder="Phone Number">
-                </div>
-
-                <!-- Password Input -->
-                <input type="password" class="w-full p-3 border rounded-lg" placeholder="Password">
-
-                <!-- Sign Up Button -->
-                <button type="submit" class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90">
-                    Sign up
-                </button>
-            </form>
+      <div class="signup-container mx-auto">
+        <div class="flex justify-center mb-6">
+          <div
+            class="rounded-full bg-gray-100 p-2 w-24 h-24 flex items-center justify-center"
+          >
+            <img src="images/blue.png" alt="Farmer Avatar" class="w-20 h-20" />
+          </div>
         </div>
+
+        <h1 class="text-2xl font-bold text-center mb-8">Sign up</h1>
+
+        <form id="signupForm" class="space-y-6">
+          <button
+            type="button"
+            id="googleSignIn"
+            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
+          >
+            <img src="images/google.png" alt="Google Logo" class="w-6 h-6" />
+            <span>Sign up with Google</span>
+          </button>
+
+          <div class="text-center text-gray-500">OR</div>
+
+          <div class="relative">
+            <input
+              id="phone"
+              type="tel"
+              name="phone"
+              class="w-full p-3 pl-20 border rounded-lg"
+              placeholder="Phone Number"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90"
+          >
+            Verify
+          </button>
+
+          <div id="verification-section" class="hidden space-y-4">
+            <input
+              id="verificationCode"
+              type="text"
+              name="verificationCode"
+              class="w-full p-3 border rounded-lg"
+              placeholder="Verification Code"
+            />
+            <div
+              class="g-recaptcha"
+              data-sitekey="6LedjW8qAAAAAOQizxfjXiN5JkT_Y6jjCTxeKANT"
+            ></div>
+
+            <button
+              id="verifyCodeButton"
+              type="button"
+              class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90"
+            >
+              Verify Code
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
+    <script
+      src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+      async
+      defer
+    ></script>
+
     <script>
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Add your sign up logic here
-            console.log('Sign up submitted');
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
+
+      let recaptchaVerifier;
+
+      function onloadCallback() {
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier("phone", {
+          size: "invisible",
+          callback: (response) => {},
         });
+      }
+      const app = firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const phoneInputField = document.querySelector("#phone");
+      const verificationSection = document.getElementById(
+        "verification-section"
+      );
+      const verifyCodeButton = document.getElementById("verifyCodeButton");
+      let verificationId;
+
+      // Google Sign-In
+      const googleProvider = new firebase.auth.GoogleAuthProvider();
+      document.getElementById("googleSignIn").addEventListener("click", () => {
+        auth
+          .signInWithPopup(googleProvider)
+          .then((result) => {
+            const user = result.user;
+            console.log("User signed in:", user);
+            // Redirect or perform actions after successful sign in
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error("Sign-in error:", errorCode, errorMessage);
+          });
+      });
+
+      // Phone Input Initialization
+      const phoneInput = window.intlTelInput(phoneInputField, {
+        utilsScript:
+          "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        initialCountry: "ng", // Set initial country to Nigeria
+        geoIpLookup: function (success, failure) {
+          success("ng"); // Always return Nigeria
+        },
+        preferredCountries: ["ng", "gh", "gb", "us"],
+        onlyCountries: ["ng", "gh", "gb", "us"], // Limit options to these countries
+        separateDialCode: true, // Ensure dial code is always visible
+      });
+
+      // Phone Number Verification
+      document.getElementById("signupForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const phoneNumber = phoneInput.getNumber();
+
+        auth
+          .signInWithPhoneNumber(phoneNumber, recaptchaVerifier) // Pass recaptchaVerifier
+          .then((confirmationResult) => {
+            verificationId = confirmationResult.verificationId;
+            console.log("Verification ID:", verificationId);
+            verificationSection.classList.remove("hidden");
+          })
+          .catch((error) => {
+            console.error("Error during phone number verification:", error);
+          });
+      });
+
+      verifyCodeButton.addEventListener("click", () => {
+        const code = document.getElementById("verificationCode").value;
+        const credential = firebase.auth.PhoneAuthProvider.credential(
+          verificationId,
+          code
+        );
+        auth
+          .signInAndRetrieveDataWithCredential(credential)
+          .then((result) => {
+            const user = result.user;
+            console.log("User signed in successfully:", user);
+            // Perform actions after successful verification
+          })
+          .catch((error) => {
+            console.error("Error verifying code:", error);
+          });
+      });
     </script>
-</body>
+  </body>
 </html>
