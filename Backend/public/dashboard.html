@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agrovest Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    />
+    <style>
+      .agrovest-green {
+        background-color: #1b4d2e;
+      }
+      .agrovest-text-green {
+        color: #1b4d2e;
+      }
+
+      @media (min-width: 768px) {
+        .login-container {
+          max-width: 480px;
+        }
+      }
+      .error-message {
+        color: red;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+      .agrovest-green {
+        background-color: #1b4d2e;
+      }
+      .agrovest-text-green {
+        color: #1b4d2e;
+      }
+
+      @media (min-width: 768px) {
+        .login-container {
+          max-width: 480px;
+        }
+      }
+      .error-message {
+        color: red;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+
+      .crop-growth-monitor {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .crop-growth-monitor .icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #e0f2f1;
+        margin-right: 1rem;
+      }
+
+      .crop-growth-monitor .icon img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .crop-growth-monitor .text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .crop-growth-monitor .text h4 {
+        font-size: 2rem; /* Make the h4 bigger */
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .crop-growth-monitor .text h4 span {
+        /* Target the "10%" specifically */
+        font-size: 3rem; /* Make the "10%" even bigger */
+        font-weight: bold;
+      }
+
+      .crop-growth-monitor .text p {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen">
+    <nav class="agrovest-green p-4 flex justify-between items-center">
+      <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-16" />
+      <a href="/menu" class="text-yellow-100 text-center text-xl">Menu</a>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+      <div class="text-center mb-8 flex items-center">
+        <img
+          src="images/woman.png"
+          alt="Farmer Avatar"
+          class="w-20 h-20 rounded-full"
+        />
+        <div class="ml-4 flex flex-col items-start">
+          <span class="text-2xl font-bold agrovest-text-green"
+            >Hi, Benjamin Adebayo!</span
+          >
+          <h3 class="text-2xl font-medium">Good Evening</h3>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="text-lg font-medium">Today, 21 Sep. 2024</h4>
+            <img src="images/cloudy.png" alt="Weather Icon" class="w-90 h-90" />
+          </div>
+          <h2 class="text-4xl font-bold mb-2">27°C</h2>
+          <p class="text-gray-600">Kano, Nigeria</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="text-lg font-medium">Tomorrow, 22 Sep. 2024</h4>
+            <img src="images/cloudy.png" alt="Weather Icon" class="w-90 h-90" />
+          </div>
+          <h2 class="text-4xl font-bold mb-2">27°C</h2>
+          <p class="text-gray-600">Kano, Nigeria</p>
+        </div>
+      </div>
+
+      <!--this is crop growth monitor-->
+      <div class="crop-growth-monitor mt-8">
+        <div class="icon">
+          <img src="images/icons8-plant-96.png" alt="Plant Icon" />
+        </div>
+        <div class="text">
+          <h4><span>10</span>% Germination</h4>
+          <!-- Wrap "10%" in a span -->
+          <p>Current Plant Season: Rainy Season</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-lg shadow-md mt-8">
+        <h3 class="text-xl font-bold mb-4">Daily Farm Advice</h3>
+        <div class="flex items-center mb-4">
+          <img src="images/red.png" alt="Farmer Icon" class="w-10 h-10" />
+          <p class="ml-4">
+            Consider light irrigation, especially for crops that require
+            consistent moisture.
+          </p>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow-md mt-8">
+        <div class="flex items-center mb-4">
+          <img src="images/red.png" alt="Farmer Icon" class="w-10 h-10" />
+          <p class="ml-4">
+            Consider baby irrigation, especially for crops that require
+            consistent moisture.
+          </p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
