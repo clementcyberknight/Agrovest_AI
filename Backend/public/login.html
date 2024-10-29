@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    text-align: center;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #1b4d3e;
+    color: #f1e8c7;
+}
+
+.logo {
+    width: 50px;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: normal;
+    color: #f1e8c7;
+}
+
+.signup-section {
+    margin-top: 20px;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.google-signup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.google-logo {
+    width: 20px;
+    margin-right: 10px;
+}
+
+.or-text {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 15px 0;
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-group {
+    display: flex;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.country-code {
+    padding: 10px;
+    background-color: #e9f6f1;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.phone-number,
+.password {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4e5937;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <img src="path/to/logo.png" alt="Agrovest Logo" class="logo">
+            <h1>Home</h1>
+        </header>
+
+        <main class="signup-section">
+            <img src="path/to/farmer-image.png" alt="Farmer Avatar" class="avatar">
+
+            <h2>Sign up</h2>
+
+            <button class="google-signup">
+                <img src="path/to/google-logo.png" alt="Google Logo" class="google-logo">
+                Sign up with Google
+            </button>
+
+            <p class="or-text">OR</p>
+
+            <form class="signup-form">
+                <div class="input-group">
+                    <select class="country-code">
+                        <option value="+234">🇳🇬 +234</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <!-- Add more country codes as needed -->
+                    </select>
+                    <input type="tel" placeholder="Phone Number" class="phone-number" required>
+                </div>
+
+                <input type="password" placeholder="Password" class="password" required>
+
+                <button type="submit" class="signup-button">Sign up</button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+
+    </script>
+</body>
+</html>
