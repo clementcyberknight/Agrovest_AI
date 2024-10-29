@@ -1,0 +1,269 @@
+
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+/* Header */
+header {
+  background-color: #1d5422;
+  padding: 1rem 0;
+}
+
+header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 90%; /* Limit container width for mobile */
+  margin: 0 auto; /* Center on smaller screens */
+}
+
+header img {
+  height: 50px;
+}
+
+header nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem; /* Adjust gap for mobile */
+}
+
+header nav ul li a {
+  color: #b8e197;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+header nav ul li a.active {
+  color: #d2ff4d;
+}
+
+header .btn {
+  background-color: #b8e197;
+  color: #1d5422;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+/* Hero Section */
+.hero {
+  background-color: #1d5422;
+  color: #fff;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 2rem; /* Adjust font size for mobile */
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1rem; /* Adjust font size for mobile */
+  margin-bottom: 1.5rem;
+}
+
+.hero .btn {
+  background-color: #b8e197;
+  color: #1d5422;
+  padding: 0.7rem 1.5rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.hero-images {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem; /* Adjust gap for mobile */
+  margin-top: 2rem;
+}
+
+.hero-images img {
+  width: 60px; /* Adjust image width for mobile */
+  border-radius: 10px;
+}
+
+/* About Section */
+.about-section {
+  background-color: #d2eac7;
+  padding: 3rem 0 6rem 0;
+}
+
+.about-container {
+  max-width: 90%; /* Limit container width for mobile */
+  margin: 0 auto;
+  padding: 0 1rem; /* Adjust side padding for mobile */
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  align-items: center;
+  gap: 1rem; /* Adjust gap for mobile */
+}
+
+.about-image img {
+  width: 100%; /* Full width image for mobile */
+  border-radius: 10px;
+}
+
+.about-content h2 {
+  font-size: 1.8rem; /* Adjust font size for mobile */
+  color: #1d5422;
+}
+
+.about-content p {
+  font-size: 0.9rem; /* Adjust font size for mobile */
+  margin-top: 1rem;
+  color: #333;
+}
+
+/* Offers Section */
+.offers {
+  background-color: #1d5422;
+  color: #fff;
+  padding: 6rem 0; /* Top and bottom padding */
+  text-align: center;
+}
+
+.offers .container {
+  max-width: 90%; /* Limit container width for mobile */
+  margin: 0 auto;
+  padding: 0 1rem; /* Adjust side padding for mobile */
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  align-items: center;
+}
+
+.offers h2 {
+  font-size: 1.8rem; /* Adjust font size for mobile */
+  margin-bottom: 2rem;
+}
+
+.offer-items {
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  gap: 1rem; /* Adjust gap for mobile */
+}
+
+.offer-item {
+  background-color: #4f9159;
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 100%; /* Full width for mobile */
+  text-align: left;
+}
+
+.offer-item h3 {
+  font-size: 1.1rem; /* Adjust font size for mobile */
+  margin: 1rem 0;
+}
+
+.offer-item p {
+  font-size: 0.8rem; /* Adjust font size for mobile */
+  color: #d2eac7;
+}
+
+.offer-item img {
+  width: 30px; /* Adjust image width for mobile */
+}
+
+/* Footer */
+footer {
+  background-color: #d8cccc;
+  color: #333;
+  padding: 2rem 0;
+  text-align: center;
+  border-top: 1px solid #e1e1e1;
+}
+
+footer .container {
+  max-width: 90%; /* Limit container width for mobile */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  align-items: center;
+  gap: 1rem; /* Adjust gap for mobile */
+}
+
+footer h3 {
+  font-size: 1.3rem; /* Adjust font size for mobile */
+  color: #1d5422;
+}
+
+footer p {
+  font-size: 0.9rem; /* Adjust font size for mobile */
+  margin: 0.5rem 0;
+}
+
+footer form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%; /* Full width for mobile */
+}
+
+footer form input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  flex-grow: 1; /* Allow input to fill available space */
+}
+
+footer form button {
+  background-color: #4f9159;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.footer-right ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column; /* Stack on mobile */
+  gap: 0.5rem; /* Adjust gap for mobile */
+}
+
+.footer-right ul li a {
+  color: #333;
+  text-decoration: none;
+}
+
+.social-icons a {
+  margin: 0 0.5rem;
+}
+
+.social-icons img {
+  width: 20px; /* Adjust image size for mobile */
+  height: 20px;
+}
+
+footer .copyright {
+  font-size: 0.7rem; /* Adjust font size for mobile */
+  margin-top: 1rem;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero p {
+    font-size: 0.9rem;
+  }
+
+  .about-container {
+    padding: 0 0.5rem; /* Reduce padding on smaller screens */
+  }
+}
