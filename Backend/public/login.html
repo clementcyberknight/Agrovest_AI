@@ -8,11 +8,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
       rel="stylesheet"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
-    />
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
       .agrovest-green {
         background-color: #1b4d2e;
@@ -25,95 +20,27 @@
           max-width: 480px;
         }
       }
-
-      /* Style the phone input */
-      .intl-tel-input {
-        position: relative;
-        width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 8px 10px;
-        font-size: 16px;
+      .error-message {
+        color: red;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
       }
-
-      .intl-tel-input .selected-flag {
-        width: 32px;
-        height: 32px;
-        margin-right: 8px;
-        border-radius: 50%;
-        overflow: hidden;
-      }
-
-      .intl-tel-input .selected-flag img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .intl-tel-input .country-list {
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        position: absolute;
-        z-index: 10;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        max-height: 300px;
-        overflow-y: auto;
-        padding: 8px;
-      }
-
-      .intl-tel-input .country-list .country {
-        display: flex;
-        align-items: center;
-        padding: 8px;
-        border-bottom: 1px solid #ccc;
-        cursor: pointer;
-      }
-
-      .intl-tel-input .country-list .country:last-child {
-        border-bottom: none;
-      }
-
-      .intl-tel-input .country-list .country .flag {
-        width: 32px;
-        height: 32px;
-        margin-right: 8px;
-        border-radius: 50%;
-        overflow: hidden;
-      }
-
-      .intl-tel-input .country-list .country .flag img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .intl-tel-input .country-list .country .country-name {
-        font-size: 14px;
-      }
-
-      /* Improve form styling */
       form {
         width: 100%;
       }
-
-      .error-message {
-        color: red;
-        margin-top: 5px;
+      label {
+        font-weight: 600;
+      }
+      input,
+      button {
+        border-radius: 0.25rem;
       }
     </style>
   </head>
   <body class="bg-white min-h-screen">
     <nav class="agrovest-green p-4 flex justify-between items-center">
-      <div class="flex items-center">
-        <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-24" />
-      </div>
-      <a
-        href="/"
-        class="text-yellow-100 text-center text-xl hidden inline md:inline"
+      <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-16" />
+      <a href="/" class="text-yellow-100 text-center text-xl hidden md:inline"
         >Home</a
       >
     </nav>
@@ -127,7 +54,6 @@
             <img src="images/blue.png" alt="Farmer Avatar" class="w-20 h-20" />
           </div>
         </div>
-
         <h1 class="text-2xl font-bold text-center mb-8">Sign up</h1>
 
         <form id="signupForm" class="space-y-6">
@@ -139,64 +65,65 @@
             <img src="images/google.png" alt="Google Logo" class="w-6 h-6" />
             <span>Sign up with Google</span>
           </button>
-
+          <button
+            type="button"
+            id="facebookSignIn"
+            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
+          >
+            <img
+              src="images/facebook.png"
+              alt="Facebook Logo"
+              class="w-6 h-6"
+            />
+            <span>Sign up with Facebook</span>
+          </button>
           <div class="text-center text-gray-500">OR</div>
 
-          <div class="relative">
+          <div>
+            <label for="email" class="block text-gray-700 font-bold mb-2"
+              >Email</label
+            >
             <input
-              id="phone"
-              type="tel"
-              name="phone"
-              class="w-full p-3 pl-20 border rounded-lg"
-              placeholder="Phone Number"
+              id="email"
+              type="email"
+              name="email"
+              class="w-full p-3 border rounded-lg"
+              placeholder="Email"
             />
-            <span id="phone-error" class="error-message"></span>
+            <span id="email-error" class="error-message"></span>
+          </div>
+          <div>
+            <label for="password" class="block text-gray-700 font-bold mb-2"
+              >Password</label
+            >
+            <input
+              id="password"
+              type="password"
+              name="password"
+              class="w-full p-3 border rounded-lg"
+              placeholder="Password"
+            />
+            <span id="password-error" class="error-message"></span>
           </div>
 
           <button
             type="submit"
+            id="submitButton"
             class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90"
           >
-            Verify
+            Sign Up
           </button>
-
-          <div id="verification-section" class="hidden space-y-4">
-            <input
-              id="verificationCode"
-              type="text"
-              name="verificationCode"
-              class="w-full p-3 border rounded-lg"
-              placeholder="Verification Code"
-            />
-            <span id="code-error" class="error-message"></span>
-            <div
-              class="g-recaptcha"
-              data-sitekey="6LedjW8qAAAAAOQizxfjXiN5JkT_Y6jjCTxeKANT"
-            ></div>
-
-            <button
-              id="verifyCodeButton"
-              type="button"
-              class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90"
-            >
-              Verify Code
-            </button>
-          </div>
         </form>
       </div>
     </main>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
-    <script
-      src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
-      async
-      defer
-    ></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <script src="https://connect.facebook.net/en_US/sdk.js"></script>
 
-    <script>
+    <script type="module">
+      // Your Firebase config
       const firebaseConfig = {
         apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
         authDomain: "agrovestai.firebaseapp.com",
@@ -206,109 +133,126 @@
         appId: "1:933337765267:web:49a8e878e0750792b88466",
         measurementId: "G-5G75YCGQ0Y",
       };
+      firebase.initializeApp(firebaseConfig);
 
-      let recaptchaVerifier;
-      let verificationId;
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const emailError = document.getElementById("email-error");
+      const passwordError = document.getElementById("password-error");
+      const submitButton = document.getElementById("submitButton");
+      const googleSignInButton = document.getElementById("googleSignIn");
+      const facebookSignInButton = document.getElementById("facebookSignIn");
 
-      function onloadCallback() {
-        recaptchaVerifier = new firebase.auth.RecaptchaVerifier("phone", {
-          size: "invisible",
-          callback: (response) => {},
-        });
-      }
-      const app = firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const phoneInputField = document.querySelector("#phone");
-      const verificationSection = document.getElementById(
-        "verification-section"
-      );
-      const verifyCodeButton = document.getElementById("verifyCodeButton");
-      const phoneError = document.getElementById("phone-error");
-      const codeError = document.getElementById("code-error");
+      submitButton.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevent default form submission
 
-      // Google Sign-In
-      const googleProvider = new firebase.auth.GoogleAuthProvider();
-      document.getElementById("googleSignIn").addEventListener("click", () => {
-        auth
-          .signInWithPopup(googleProvider)
-          .then((result) => {
-            const user = result.user;
-            console.log("User signed in:", user);
-            // Redirect or perform actions after successful sign in
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        // Basic validation (add more robust validation as needed)
+        if (!email) {
+          emailError.textContent = "Please enter your email.";
+          return;
+        }
+        if (!password) {
+          passwordError.textContent = "Please enter your password.";
+          return;
+        }
+
+        firebase
+          .auth()
+          .createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            console.log("User created:", user);
+            // Redirect or perform other actions after successful signup
           })
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.error("Sign-in error:", errorCode, errorMessage);
+            console.error("Error creating user:", error);
+            // Display appropriate error messages to the user
+            if (errorCode === "auth/email-already-in-use") {
+              emailError.textContent = "Email already in use.";
+            } else if (errorCode === "auth/weak-password") {
+              passwordError.textContent = "Password too weak.";
+            } else {
+              // Handle other errors
+              emailError.textContent = errorMessage;
+            }
           });
       });
 
-      // Phone Input Initialization
-      const phoneInput = window.intlTelInput(phoneInputField, {
-        utilsScript:
-          "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-        initialCountry: "ng",
-        geoIpLookup: function (success, failure) {
-          success("ng");
-        },
-        preferredCountries: ["ng", "gh", "gb", "us"],
-        onlyCountries: ["ng", "gh", "gb", "us"],
-        separateDialCode: true,
-      });
-
-      // Phone Number Verification
-      document.getElementById("signupForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        phoneError.textContent = "";
-        const phoneNumber = phoneInput.getNumber();
-
-        if (!phoneNumber || !phoneInput.isValidNumber()) {
-          phoneError.textContent = "Please enter a valid phone number.";
-          return;
-        }
-
-        auth
-          .signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
-          .then((confirmationResult) => {
-            verificationId = confirmationResult.verificationId;
-            console.log("Verification ID:", verificationId);
-            verificationSection.classList.remove("hidden");
-          })
-          .catch((error) => {
-            console.error("Error during phone number verification:", error);
-            phoneError.textContent =
-              "Failed to verify phone number. Please try again.";
-          });
-      });
-
-      verifyCodeButton.addEventListener("click", () => {
-        codeError.textContent = "";
-        const code = document.getElementById("verificationCode").value;
-
-        if (!code) {
-          codeError.textContent = "Please enter the verification code.";
-          return;
-        }
-
-        const credential = firebase.auth.PhoneAuthProvider.credential(
-          verificationId,
-          code
-        );
-
-        auth
-          .signInAndRetrieveDataWithCredential(credential)
+      // Google Sign-In (remains the same)
+      googleSignInButton.addEventListener("click", () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase
+          .auth()
+          .signInWithPopup(provider)
           .then((result) => {
+            const credential =
+              firebase.auth.GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
             const user = result.user;
-            console.log("User signed in successfully:", user);
-            // Perform actions after successful verification
+            console.log("User signed in with Google:", user);
+            // Redirect or perform other actions after successful sign-in
           })
           .catch((error) => {
-            console.error("Error verifying code:", error);
-            codeError.textContent =
-              "Invalid verification code. Please try again.";
+            console.error("Error signing in with Google:", error);
+            // Handle errors
           });
       });
+
+      // Facebook Sign-In
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: "YOUR_FACEBOOK_APP_ID", // Replace with your Facebook App ID
+          cookie: true,
+          xfbml: true,
+          version: "v17.0",
+        });
+
+        facebookSignInButton.addEventListener("click", function () {
+          FB.login(
+            function (response) {
+              if (response.authResponse) {
+                // Successful login
+                const accessToken = response.authResponse.accessToken;
+                const facebookCredential =
+                  firebase.auth.FacebookAuthProvider.credential(accessToken);
+                firebase
+                  .auth()
+                  .signInWithCredential(facebookCredential)
+                  .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log("User signed in with Facebook:", user);
+                    // Redirect or perform other actions after successful sign-in
+                  })
+                  .catch((error) => {
+                    console.error("Error signing in with Facebook:", error);
+                    // Handle errors
+                  });
+              } else {
+                console.log("User cancelled login or did not fully authorize.");
+              }
+            },
+            { scope: "email" }
+          );
+        });
+      };
+
+      (function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+          return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
     </script>
   </body>
 </html>
