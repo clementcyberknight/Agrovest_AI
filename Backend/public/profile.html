@@ -8,13 +8,13 @@
 </head>
 <body>
     <header>
-        <div class="header">
-            <img src="images/AgroVest.png" alt="Agrovest Logo">
-            <div class="menu">
-              <p>Menu</p>
-            </div>
+        <div class="logo">
+          <img src="images/AgroVest.png" alt="Agrovest Logo">
         </div>
-    </header>
+        <nav>
+          <a href="#">Menu</a>
+        </nav>
+      </header>
 
     <div class="container">
         <h1>Tell Us More About You</h1>
@@ -77,14 +77,31 @@ body {
     min-height: 100vh;
 }
 
+/* Header styling */
 header {
-    background-color: #1b472a;
-    padding: 10px 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+      background-color: #1b472a;
+      padding: 10px 20px;
+      text-align: left;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    header .logo img {
+      height: 40px;
+    }
+
+    header nav a {
+      color: #e8d88f;
+      font-size: 18px;
+      text-decoration: none;
+      padding: 5px;
+      cursor: pointer;
+    }
 
 .container {
     background-color: #fff;
