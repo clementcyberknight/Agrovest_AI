@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note</title>
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      /* Reset styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body styling */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f3f3;
+        color: #333333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      /* Loading screen */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        color: #fff;
+        font-size: 18px;
+      }
+
+      .loader {
+        width: 80px;
+        height: 80px;
+        border: 10px solid #f3f3f3;
+        border-radius: 50%;
+        border-top-color: #e8d88f;
+        animation: spin 1s ease infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-message {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      /* Header styling */
+      header {
+        background-color: #1b472a;
+        padding: 10px 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      header .logo img {
+        height: 70px;
+      }
+
+      header nav a {
+        color: #e8d88f;
+        font-size: 18px;
+        text-decoration: none;
+        padding: 5px;
+        margin-left: 15px;
+        transition: color 0.3s;
+      }
+
+      header nav a:hover {
+        color: #fff;
+      }
+
+      /* Main content styling */
+      .container {
+        margin-top: 100px;
+        max-width: 800px;
+        width: 100%;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        font-size: 1.4em;
+        margin-bottom: 12px;
+        color: #006400;
+      }
+
+      ul {
+        list-style-type: disc;
+        margin-left: 20px;
+        padding-left: 0;
+        color: #333333;
+      }
+
+      ul li {
+        margin: 8px 0;
+      }
+
+      /* Call-to-action button */
+      .cta-button {
+        display: inline-block;
+        background-color: #1b472a;
+        color: #ffffff;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 8px;
+        margin: 20px auto 0;
+        cursor: pointer;
+        text-decoration: none;
+        width: 100%;
+        max-width: 250px;
+        transition: background-color 0.3s;
+      }
+
+      .cta-button:hover {
+        background-color: #144a2a;
+      }
+
+      /* Mobile view adjustments */
+      @media (max-width: 600px) {
+        header nav a {
+          font-size: 16px;
+          margin-left: 10px;
+        }
+
+        .container {
+          font-size: 1em;
+          padding: 15px;
+        }
+
+        .loading-message {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-screen">
+      <div class="loader"></div>
+      <p class="loading-message">Retrieving soil data of location...</p>
+    </div>
+
+    <header>
+      <div class="logo">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      </div>
+      <nav>
+        <a href="#">Menu</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <div class="container" id="soilReport">
+        <!-- Soil report content will be dynamically inserted here -->
+      </div>
+      <a href="#" class="cta-button">Save Report</a>
+    </div>
+
+    <script>
+      setTimeout(() => {
+        document.querySelector(".loading-screen").style.display = "none";
+      }, 3000);
+    </script>
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+      import {
+        getFunctions,
+        httpsCallable,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+      import { GoogleGenerativeAI } from "@google/generative-ai";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const functions = getFunctions(app);
+      const db = getFirestore(app);
+      const API_KEY = "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE"; // Replace with your actual API key
+      const genAI = new GoogleGenerativeAI(API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const soilProperties = [
+        "aluminium_extractable",
+        "phosphorous_extractable",
+        "potassium_extractable",
+        "carbon_organic",
+        "ph",
+        "texture_class",
+        "calcium_extractable",
+        "magnesium_extractable",
+        "nitrogen_total",
+        "bulk_density",
+        "cation_exchange_capacity",
+        "sand_content",
+        "silt_content",
+        "clay_content",
+        "bedrock_depth",
+      ];
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        const loadingScreen = document.getElementById("loadingScreen");
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+
+              let allResults = {};
+
+              try {
+                for (const property of soilProperties) {
+                  const getSoilInformation = httpsCallable(
+                    functions,
+                    "getSoilInformation"
+                  );
+                  const result = await getSoilInformation({
+                    lat,
+                    lon,
+                    property,
+                  });
+                  allResults[property] = result.data;
+                }
+                console.log("Soil Information:", allResults);
+              } catch (error) {
+                console.error("Error fetching soil data:", error);
+              } finally {
+                loadingScreen.style.display = "none";
+              }
+            },
+            (error) => {
+              console.error("Geolocation error:", error);
+              loadingScreen.style.display = "none";
+            }
+          );
+        }
+      });
+      const generationConfig = {
+        temperature: 0.5,
+        topP: 1,
+        topK: 32,
+        maxOutputTokens: 10000,
+        responseMimeType: "text/plain",
+      };
+
+      const prompt = allResults;
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = await response.text();
+
+      const formattedText = formatText(text);
+      function formatText(text) {
+        text = text.replace(/## (.*?)(\n|$)/g, "<b>$1</b>$2");
+        text = text.replace(/\*\*(.*?)\*\*/g, "<h4>$1</h4>");
+        text = text.replace(/^\* (.*?)(\n|$)/gm, "<li>$1</li>");
+        if (/<li>.*<\/li>/s.test(text)) {
+          text = text.replace(/(<li>.*?<\/li>)/gs, "<ul>$1</ul>");
+        }
+        text = text.replace(/\*/g, "");
+        text = text.replace(/(\d+\. )/g, "<br>$1");
+
+        return text;
+      }
+    </script>
+  </body>
+</html>

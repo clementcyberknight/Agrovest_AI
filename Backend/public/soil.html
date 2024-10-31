@@ -136,13 +136,6 @@
               // Store the result in the results object
               allResults[property] = result.data;
             }
-
-            // Display all results in the result div
-            document.getElementById("result").innerText = JSON.stringify(
-              allResults,
-              null,
-              2
-            );
           } catch (error) {
             console.error("Error fetching soil data:", error);
             document.getElementById("result").innerText =
