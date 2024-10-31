@@ -8,6 +8,12 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
     <style>
       .agrovest-green {
         background-color: #1b4d2e;
@@ -18,6 +24,12 @@
       @media (min-width: 768px) {
         .signup-container {
           max-width: 480px;
+        }
+        .content-wrapper {
+          min-height: calc(100vh - 80px);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
       }
       .error-message {
@@ -35,11 +47,10 @@
       button {
         border-radius: 0.25rem;
       }
-      /* Added styles for OR divider */
       .or-divider {
         display: flex;
         align-items: center;
-        margin: 1rem 0;
+        margin: 0.5rem 0;
       }
       .or-divider::before,
       .or-divider::after {
@@ -56,94 +67,104 @@
       }
     </style>
   </head>
-  <body class="bg-white min-h-screen">
-    <nav class="agrovest-green p-4 flex justify-between items-center">
-      <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-16" />
-      <a href="/" class="text-yellow-100 text-center text-xl hidden md:inline"
+  <body class="bg-white">
+    <nav class="agrovest-green p-2 flex justify-between items-center">
+      <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-12" />
+      <a
+        href="index.html"
+        class="text-yellow-100 text-center text-xl hidden md:inline"
         >Home</a
       >
     </nav>
 
-    <main class="container mx-auto px-4 mt-8">
-      <div class="signup-container mx-auto">
-        <div class="flex justify-center mb-6">
-          <div
-            class="rounded-full bg-gray-100 p-2 w-24 h-24 flex items-center justify-center"
-          >
-            <img src="images/blue.png" alt="Farmer Avatar" class="w-20 h-20" />
+    <div class="content-wrapper">
+      <main class="container mx-auto px-4 mt-4">
+        <div class="signup-container mx-auto">
+          <div class="flex justify-center mb-4">
+            <div
+              class="rounded-full bg-gray-100 p-2 w-16 h-16 flex items-center justify-center"
+            >
+              <img
+                src="images/blue.png"
+                alt="Farmer Avatar"
+                class="w-12 h-12"
+              />
+            </div>
           </div>
+          <h1 class="text-xl font-bold text-center mb-4">Sign up</h1>
+          <div id="alert-container"></div>
+
+          <form id="signupForm" class="space-y-3">
+            <button
+              type="button"
+              id="googleSignIn"
+              class="w-full flex items-center justify-center gap-2 border rounded-lg p-2 hover:bg-gray-50"
+            >
+              <img src="images/google.png" alt="Google Logo" class="w-5 h-5" />
+              <span>Sign up with Google</span>
+            </button>
+            <button
+              type="button"
+              id="facebookSignIn"
+              class="w-full flex items-center justify-center gap-2 border rounded-lg p-2 hover:bg-gray-50"
+            >
+              <img
+                src="images/facebook.png"
+                alt="Facebook Logo"
+                class="w-5 h-5"
+              />
+              <span>Sign up with Facebook</span>
+            </button>
+            <div class="or-divider">
+              <span class="text-center text-gray-500">OR</span>
+            </div>
+
+            <div>
+              <label for="email" class="block text-gray-700 font-bold mb-1"
+                >Email</label
+              >
+              <input
+                id="email"
+                type="email"
+                name="email"
+                class="w-full p-2 border rounded-lg"
+                placeholder="Email"
+              />
+              <span id="email-error" class="error-message"></span>
+            </div>
+            <div>
+              <label for="password" class="block text-gray-700 font-bold mb-1"
+                >Password</label
+              >
+              <input
+                id="password"
+                type="password"
+                name="password"
+                class="w-full p-2 border rounded-lg"
+                placeholder="Password"
+              />
+              <span id="password-error" class="error-message"></span>
+            </div>
+
+            <button
+              type="submit"
+              id="submitButton"
+              class="w-full agrovest-green text-white rounded-lg p-2 hover:opacity-90"
+            >
+              Sign Up
+            </button>
+          </form>
+          <div id="alert-container"></div>
+          <p class="text-center mt-2">
+            <a
+              href="login.html"
+              class="text-agrovest-text-green hover:underline"
+              >Already have an account? Log in</a
+            >
+          </p>
         </div>
-        <h1 class="text-2xl font-bold text-center mb-8">Sign up</h1>
-        <div id="alert-container"></div>
-
-        <form id="signupForm" class="space-y-6">
-          <button
-            type="button"
-            id="googleSignIn"
-            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
-          >
-            <img src="images/google.png" alt="Google Logo" class="w-6 h-6" />
-            <span>Sign up with Google</span>
-          </button>
-          <button
-            type="button"
-            id="facebookSignIn"
-            class="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-50"
-          >
-            <img
-              src="images/facebook.png"
-              alt="Facebook Logo"
-              class="w-6 h-6"
-            />
-            <span>Sign up with Facebook</span>
-          </button>
-          <div class="or-divider">
-            <span class="text-center text-gray-500">OR</span>
-          </div>
-
-          <div>
-            <label for="email" class="block text-gray-700 font-bold mb-2"
-              >Email</label
-            >
-            <input
-              id="email"
-              type="email"
-              name="email"
-              class="w-full p-3 border rounded-lg"
-              placeholder="Email"
-            />
-            <span id="email-error" class="error-message"></span>
-          </div>
-          <div>
-            <label for="password" class="block text-gray-700 font-bold mb-2"
-              >Password</label
-            >
-            <input
-              id="password"
-              type="password"
-              name="password"
-              class="w-full p-3 border rounded-lg"
-              placeholder="Password"
-            />
-            <span id="password-error" class="error-message"></span>
-          </div>
-
-          <button
-            type="submit"
-            id="submitButton"
-            class="w-full agrovest-green text-white rounded-lg p-3 hover:opacity-90"
-          >
-            Sign Up
-          </button>
-        </form>
-        <div id="alert-container"></div>
-        <p class="text-center mt-4">
-          <a href="login.html" class="text-agrovest-text-green hover:underline"
-            >Already have an account? Log in</a
-          >
-        </p>
-      </div>
-    </main>
+      </main>
+    </div>
 
     <script src="https://connect.facebook.net/en_US/sdk.js"></script>
 
@@ -190,19 +211,21 @@
             : "bg-gray-50 text-gray-800";
 
         const alertDiv = document.createElement("div");
-        alertDiv.className = `${alertClass} flex items-center p-4 mb-4 text-sm rounded-lg`;
+        alertDiv.className = `$ flex items-center p-4 mb-4 text-sm rounded-lg`;
         alertDiv.innerHTML = `
-            <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-            </svg>
-            <div>
-                <span class="font-medium">${
-                  type === "danger"
-                    ? "Error"
-                    : type.charAt(0).toUpperCase() + type.slice(1) + " alert!"
-                }</span> ${message}
-            </div>
-        `;
+                <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <div>
+                    <span class="font-medium">${
+                      type === "danger"
+                        ? "Error"
+                        : type.charAt(0).toUpperCase() +
+                          type.slice(1) +
+                          " alert!"
+                    }</span> $
+                </div>
+            `;
         alertContainer.appendChild(alertDiv);
         setTimeout(() => alertDiv.remove(), 5000);
       };
@@ -238,9 +261,10 @@
 
           // Send email verification
           await sendEmailVerification(user);
+          localStorage.setItem("userId", user.uid);
 
           // Redirect to login page
-          window.location.href = "login.html";
+          window.location.href = "profile.html";
         } catch (error) {
           console.error("Error creating user:", error);
           if (error.code === "auth/email-already-in-use") {
@@ -259,7 +283,8 @@
           .then((result) => {
             const user = result.user;
             console.log("User signed in with Google:", user);
-            window.location.href = "home.html";
+            localStorage.setItem("userId", user.uid);
+            window.location.href = "profile.html";
           })
           .catch((error) => {
             console.error("Error signing in with Google:", error);

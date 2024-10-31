@@ -1,136 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Soil Data Test</title>
-  <style>
-    body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  background-color: #f4f4f9;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soil Data Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f9;
+      }
 
-#container {
-  max-width: 800px;
-  width: 100%;
-  padding: 40px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+      #container {
+        max-width: 800px;
+        width: 100%;
+        padding: 40px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
 
-label {
-  display: block;
-  margin-top: 10px;
-}
+      label {
+        display: block;
+        margin-top: 10px;
+      }
 
-input, button {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+      input,
+      button {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
 
-#result {
-  margin-top: 20px;
-  padding: 20px;
-  background: #f0f8ff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  white-space: pre-wrap;
-  overflow-y: auto;
-  max-height: 400px;
-}
-  </style>
-</head>
-<body>
+      #result {
+        margin-top: 20px;
+        padding: 20px;
+        background: #f0f8ff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        white-space: pre-wrap;
+        overflow-y: auto;
+        max-height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h2>Get Soil Information</h2>
+      <form id="soilDataForm">
+        <label for="latitude">Latitude:</label>
+        <input
+          type="number"
+          id="latitude"
+          name="latitude"
+          required
+          step="any"
+        />
 
-<div id="container">
-  <h2>Get Soil Information</h2>
-  <form id="soilDataForm">
-    <label for="latitude">Latitude:</label>
-    <input type="number" id="latitude" name="latitude" required step="any">
+        <label for="longitude">Longitude:</label>
+        <input
+          type="number"
+          id="longitude"
+          name="longitude"
+          required
+          step="any"
+        />
 
-    <label for="longitude">Longitude:</label>
-    <input type="number" id="longitude" name="longitude" required step="any">
+        <button type="submit">Get Soil Data</button>
+      </form>
 
-    <button type="submit">Get Soil Data</button>
-  </form>
+      <div id="result"></div>
+    </div>
 
-  <div id="result"></div>
-</div>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-functions-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-functions-compat.js"></script>
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
 
-<script>
-  // Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
-  authDomain: "agrovestai.firebaseapp.com",
-  projectId: "agrovestai",
-  storageBucket: "agrovestai.appspot.com",
-  messagingSenderId: "933337765267",
-  appId: "1:933337765267:web:49a8e878e0750792b88466",
-  measurementId: "G-5G75YCGQ0Y"
-};
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const functions = firebase.functions(app);
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const functions = firebase.functions(app);
+      // Array of soil properties to request
+      const soilProperties = [
+        "aluminium_extractable",
+        "phosphorous_extractable",
+        "potassium_extractable",
+        "carbon_organic",
+        "ph",
+        "texture_class",
+        "calcium_extractable", // Essential for cell wall structure
+        "magnesium_extractable", // Important for chlorophyll and plant growth
+        "nitrogen_total", // Key nutrient for plant growth
+        "bulk_density", // Influences root growth, water infiltration
+        "cation_exchange_capacity", // Reflects soil's nutrient-holding capacity
+        "sand_content", // Affects drainage and aeration
+        "silt_content", // Affects water retention
+        "clay_content", // Affects nutrient holding and drainage
+        "bedrock_depth", // Influences rooting depth and available soil volume
+      ];
 
-// Array of soil properties to request
-const soilProperties = [
-  "aluminium_extractable",
-  "phosphorous_extractable",
-  "potassium_extractable",
-  "carbon_organic",
-  "ph",
-  "texture_class",
-  "calcium_extractable",         // Essential for cell wall structure
-  "magnesium_extractable",       // Important for chlorophyll and plant growth
-  "nitrogen_total",              // Key nutrient for plant growth
-  "bulk_density",                // Influences root growth, water infiltration
-  "cation_exchange_capacity",    // Reflects soil's nutrient-holding capacity
-  "sand_content",                // Affects drainage and aeration
-  "silt_content",                // Affects water retention
-  "clay_content",                // Affects nutrient holding and drainage
-  "bedrock_depth"             // Influences rooting depth and available soil volume
-];
+      document
+        .getElementById("soilDataForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
 
+          const lat = document.getElementById("latitude").value;
+          const lon = document.getElementById("longitude").value;
 
-document.getElementById("soilDataForm").addEventListener("submit", async (event) => {
-  event.preventDefault();
+          let allResults = {};
 
-  const lat = document.getElementById("latitude").value;
-  const lon = document.getElementById("longitude").value;
+          try {
+            for (const property of soilProperties) {
+              // Call the Cloud Function for each soil property
+              const getSoilInformation =
+                functions.httpsCallable("getSoilInformation");
+              const result = await getSoilInformation({ lat, lon, property });
 
-  let allResults = {};
+              // Store the result in the results object
+              allResults[property] = result.data;
+            }
 
-  try {
-    for (const property of soilProperties) {
-      // Call the Cloud Function for each soil property
-      const getSoilInformation = functions.httpsCallable('getSoilInformation');
-      const result = await getSoilInformation({ lat, lon, property });
-
-      // Store the result in the results object
-      allResults[property] = result.data;
-    }
-
-    // Display all results in the result div
-    document.getElementById("result").innerText = JSON.stringify(allResults, null, 2);
-  } catch (error) {
-    console.error("Error fetching soil data:", error);
-    document.getElementById("result").innerText = "Error fetching soil data. Check console for details.";
-  }
-});
-</script>
-
-</body>
+            // Display all results in the result div
+            document.getElementById("result").innerText = JSON.stringify(
+              allResults,
+              null,
+              2
+            );
+          } catch (error) {
+            console.error("Error fetching soil data:", error);
+            document.getElementById("result").innerText =
+              "Error fetching soil data. Check console for details.";
+          }
+        });
+    </script>
+  </body>
 </html>

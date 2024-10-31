@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agrovest Plant Menu</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    />
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      .agrovest-green {
+        background-color: #1b4d2e;
+      }
+      .agrovest-text-green {
+        color: #1b4d2e;
+      }
+
+      .plant-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+      }
+
+      .plant-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .plant-card img {
+        width: 350px;
+        height: 200px;
+        margin-bottom: 1rem;
+      }
+
+      .plant-card h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .plant-card p {
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen">
+    <nav class="agrovest-green p-4 flex justify-between items-center">
+      <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-16" />
+      <a href="dashboard.html" class="text-yellow-100 text-center text-xl"
+        >Dashboard</a
+      >
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+      <h2 class="text-3xl font-bold mb-8">Soil Analysis menu</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          class="plant-card"
+          onclick="window.location.href='location_soil.html'"
+        >
+          <img src="images/location.jpg" alt="Soil" />
+          <h3>Locational soil Analysis</h3>
+          <p>Get soil analysis by on your location.</p>
+        </div>
+
+        <div
+          class="plant-card"
+          onclick="window.location.href='image_soil.html'"
+        >
+          <img src="images/soil1.jpg" alt="Soil" />
+          <h3>image soil analysis</h3>
+          <p>Get soil analysis base on the image of the soil.</p>
+        </div>
+
+        <div class="plant-card" onclick="window.location.href='#'">
+          <img src="images/iot.jpg" alt="Soil" />
+          <h3>soil analysis on IoT</h3>
+          <p>Get soil analysis base on the IoT device. upcoming..</p>
+        </div>
+
+        <!-- Add more plant cards here -->
+      </div>
+    </main>
+  </body>
+</html>
