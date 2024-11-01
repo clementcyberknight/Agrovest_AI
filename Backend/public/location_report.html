@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Note</title>
+    <title>AI Report</title>
     <link
       rel="icon"
       sizes="64x64"
@@ -48,21 +48,34 @@
         font-size: 18px;
       }
 
+      /* Loader animation */
       .loader {
-        width: 80px;
-        height: 80px;
-        border: 10px solid #f3f3f3;
-        border-radius: 50%;
-        border-top-color: #e8d88f;
-        animation: spin 1s ease infinite;
+        width: 50px;
+        aspect-ratio: 1;
+        display: grid;
       }
 
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
+      .loader::before,
+      .loader::after {
+        content: "";
+        grid-area: 1/1;
+        --c: no-repeat radial-gradient(farthest-side, #25b09b 92%, #0000);
+        background: var(--c) 50% 0, var(--c) 50% 100%, var(--c) 100% 50%,
+          var(--c) 0 50%;
+        background-size: 12px 12px;
+        animation: l12 1s infinite;
+      }
+
+      .loader::before {
+        margin: 4px;
+        filter: hue-rotate(45deg);
+        background-size: 8px 8px;
+        animation-timing-function: linear;
+      }
+
+      @keyframes l12 {
         100% {
-          transform: rotate(360deg);
+          transform: rotate(0.5turn);
         }
       }
 
@@ -171,7 +184,7 @@
     </style>
   </head>
   <body>
-    <div class="loading-screen">
+    <div class="loading-screen" id="loadingScreen">
       <div class="loader"></div>
       <p class="loading-message">Retrieving soil data of location...</p>
     </div>
@@ -181,15 +194,13 @@
         <img src="images/AgroVest.png" alt="Agrovest Logo" />
       </div>
       <nav>
-        <a href="#">Menu</a>
+        <a href="menu.html">Menu</a>
       </nav>
     </header>
 
-    <div class="container">
-      <div class="container" id="soilReport">
-        <!-- Soil report content will be dynamically inserted here -->
-      </div>
-      <a href="#" class="cta-button">Save Report</a>
+    <div class="container" id="container">
+      <h2>Plant Diagnosis</h2>
+      <div id="ai-report"></div>
     </div>
 
     <script>
@@ -210,6 +221,7 @@
       import {
         getFirestore,
         doc,
+        setDoc,
         getDoc,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
       import {
@@ -233,9 +245,7 @@
       const analytics = getAnalytics(app);
       const functions = getFunctions(app);
       const db = getFirestore(app);
-      const API_KEY = "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE"; // Replace with your actual API key
-      const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const userId = localStorage.getItem("userId");
 
       const soilProperties = [
         "aluminium_extractable",
@@ -257,6 +267,7 @@
 
       window.addEventListener("DOMContentLoaded", async () => {
         const loadingScreen = document.getElementById("loadingScreen");
+        const aiReportContainer = document.getElementById("ai-report");
 
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -279,7 +290,39 @@
                   });
                   allResults[property] = result.data;
                 }
-                console.log("Soil Information:", allResults);
+                console.log(allResults);
+
+                if (userId) {
+                  await setDoc(doc(db, "soil_result", userId), allResults);
+                  console.log(
+                    "Soil data saved to Firestore with userId:",
+                    userId
+                  );
+                } else {
+                  console.error("User ID not found in local storage");
+                }
+
+                const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw"; // Replace with your actual API key
+                const genAI = new GoogleGenerativeAI(API_KEY);
+                const model = genAI.getGenerativeModel({
+                  model: "tunedModels/agrovestai-j8jxe3107wz4",
+                  generationConfig: {
+                    candidateCount: 1,
+                    maxOutputTokens: 2000,
+                    temperature: 0.5,
+                  },
+                });
+
+                const prompt = `\n${JSON.stringify(allResults, null, 2)}`;
+                console.log(prompt);
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const text = await response.text();
+                const formattedText = formatText(text);
+                console.log(formattedText);
+
+                aiReportContainer.innerHTML = formattedText;
+                loadingScreen.style.display = "none";
               } catch (error) {
                 console.error("Error fetching soil data:", error);
               } finally {
@@ -293,20 +336,7 @@
           );
         }
       });
-      const generationConfig = {
-        temperature: 0.5,
-        topP: 1,
-        topK: 32,
-        maxOutputTokens: 10000,
-        responseMimeType: "text/plain",
-      };
 
-      const prompt = allResults;
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = await response.text();
-
-      const formattedText = formatText(text);
       function formatText(text) {
         text = text.replace(/## (.*?)(\n|$)/g, "<b>$1</b>$2");
         text = text.replace(/\*\*(.*?)\*\*/g, "<h4>$1</h4>");
