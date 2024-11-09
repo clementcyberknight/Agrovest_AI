@@ -222,7 +222,7 @@
   <body>
     <div class="loading-screen" id="loadingScreen">
       <div class="loader"></div>
-      <p class="loading-message">Retrieving soil data of location...</p>
+      <p class="loading-message">Generating soil Report...</p>
     </div>
 
     <header>
@@ -235,7 +235,7 @@
     </header>
 
     <div class="container" id="container">
-      <h2>Plant Diagnosis</h2>
+      <h2>Soil Report</h2>
       <div class="ai-report-loader" id="aiReportLoader">
         <div class="ai-spinner"></div>
         <p class="ai-loading-text">Generating AI Report...</p>
@@ -248,29 +248,13 @@
         document.querySelector(".loading-screen").style.display = "none";
       }, 3000);
     </script>
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
       import {
         getFirestore,
         doc,
-        setDoc,
         getDoc,
-        collection,
-        addDoc,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-      import {
-        getFunctions,
-        httpsCallable,
-      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
-      import { GoogleGenerativeAI } from "@google/generative-ai";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
@@ -282,121 +266,34 @@
         measurementId: "G-5G75YCGQ0Y",
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-      const functions = getFunctions(app);
       const db = getFirestore(app);
-      const userId = localStorage.getItem("userId");
 
-      const soilProperties = [
-        "aluminium_extractable",
-        "phosphorous_extractable",
-        "potassium_extractable",
-        "carbon_organic",
-        "ph",
-        "texture_class",
-        "calcium_extractable",
-        "magnesium_extractable",
-        "nitrogen_total",
-        "bulk_density",
-        "cation_exchange_capacity",
-        "sand_content",
-        "silt_content",
-        "clay_content",
-        "bedrock_depth",
-      ];
+      async function displayReport() {
+        try {
+          const reportDocId = sessionStorage.getItem("reportDocId");
+          if (!reportDocId) {
+            throw new Error("Report document ID not found in session storage.");
+          }
 
-      window.addEventListener("DOMContentLoaded", async () => {
-        const loadingScreen = document.getElementById("loadingScreen");
-        const aiReportContainer = document.getElementById("ai-report");
-        const aiReportLoader = document.getElementById("aiReportLoader");
+          const reportDocRef = doc(db, "user_soilImage_report", reportDocId);
+          const reportDoc = await getDoc(reportDocRef);
 
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            async (position) => {
-              const lat = position.coords.latitude;
-              const lon = position.coords.longitude;
-
-              let allResults = {};
-
-              try {
-                for (const property of soilProperties) {
-                  const getSoilInformation = httpsCallable(
-                    functions,
-                    "getSoilInformation"
-                  );
-                  const result = await getSoilInformation({
-                    lat,
-                    lon,
-                    property,
-                  });
-                  allResults[property] = result.data;
-                }
-
-                if (userId) {
-                  await setDoc(doc(db, "soil_result", userId), allResults);
-                  console.log(
-                    "Soil data saved to Firestore with userId:",
-                    userId
-                  );
-                } else {
-                  console.error("User ID not found in local storage");
-                }
-
-                const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw"; // Replace with your actual API key
-                const genAI = new GoogleGenerativeAI(API_KEY);
-                const model = genAI.getGenerativeModel({
-                  model: "tunedModels/soilreportgenerator-ytxn1vj61tpk",
-                  generationConfig: {
-                    candidateCount: 1,
-                    maxOutputTokens: 2000,
-                    temperature: 0.5,
-                  },
-                });
-
-                const prompt = `\n${JSON.stringify(allResults, null, 2)}`;
-                const result = await model.generateContent(prompt);
-                const response = await result.response;
-                const text = await response.text();
-                const formattedText = formatText(text);
-
-                aiReportLoader.classList.add("hidden");
-                aiReportContainer.style.display = "block";
-                aiReportContainer.innerHTML = formattedText;
-                if (userId) {
-                  const reportData = {
-                    userId,
-                    report: formattedText,
-                    timestamp: new Date(),
-                  };
-                  await addDoc(collection(db, "user_report"), reportData);
-                  console.log("Report saved to user_report collection");
-                } else {
-                  console.error("User ID not found in local storage");
-                }
-                loadingScreen.style.display = "none";
-              } catch (error) {
-                console.error("Error fetching soil data:", error);
-                aiReportLoader.classList.add("hidden");
-                aiReportContainer.style.display = "block";
-                aiReportContainer.innerHTML =
-                  "<p>Error generating AI report. Please try again later.</p>";
-              } finally {
-                loadingScreen.style.display = "none";
-              }
-            },
-            (error) => {
-              console.error("Geolocation error:", error);
-              loadingScreen.style.display = "none";
-              aiReportLoader.classList.add("hidden");
-              aiReportContainer.style.display = "block";
-              aiReportContainer.innerHTML =
-                "<p>Error accessing location. Please enable location services and try again.</p>";
-            }
-          );
+          if (reportDoc.exists()) {
+            const reportData = reportDoc.data();
+            const formattedText = formatText(reportData.report);
+            const aiReportContainer = document.getElementById("ai-report");
+            aiReportContainer.innerHTML = formattedText;
+            aiReportContainer.style.display = "block";
+            document.getElementById("aiReportLoader").classList.add("hidden");
+          } else {
+            throw new Error("Report document not found in Firestore.");
+          }
+        } catch (error) {
+          console.error("Error retrieving report:", error);
+          alert("Failed to retrieve the report. Please try again later.");
         }
-      });
+      }
 
       function formatText(text) {
         text = text.replace(/## (.*?)(\n|$)/g, "<b>$1</b>$2");
@@ -410,6 +307,7 @@
 
         return text;
       }
+      document.addEventListener("DOMContentLoaded", displayReport);
     </script>
   </body>
 </html>

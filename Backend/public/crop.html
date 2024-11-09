@@ -311,7 +311,7 @@
 
         try {
           const response = await fetch(
-            "https://soil-detector-7qc32u4dia-uc.a.run.app",
+            "https://plant-sensor-7qc32u4dia-uc.a.run.app",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -321,20 +321,19 @@
           if (!response.ok)
             throw new Error("Prediction failed. Please try again.");
           const result = await response.json();
-          console.log(result);
+          console.log(result); // Display or process the prediction result
 
           const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw"; // Replace with your actual API key
           const genAI = new GoogleGenerativeAI(API_KEY);
           const model = genAI.getGenerativeModel({
-            model: "tunedModels/soilanalysis-m8g43ia9f9ke",
+            model: "tunedModels/devfest-dami-b74777pk6uuq",
             generationConfig: {
               maxOutputTokens: 2000,
-              temperature: 1,
+              temperature: 0.5,
             },
           });
 
           const prompt = `${JSON.stringify(result)}`;
-          console.log(prompt);
           const airesult = await model.generateContent(prompt);
           const airesponse = await airesult.response;
           const text = await airesponse.text();
@@ -352,7 +351,7 @@
               reportData
             );
             sessionStorage.setItem("reportDocId", docRef.id);
-            window.location.href = "soil_report.html";
+            //window.location.href = "report.html";
             console.log(
               "Report saved to user_report collection with document ID:",
               docRef.id

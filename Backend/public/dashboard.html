@@ -153,25 +153,33 @@
 
       <div class="bg-blue-200 p-4 rounded-lg shadow-md mt-8">
         <h3 class="text-xl font-bold mb-4">Daily Farm Advice</h3>
-        <div class="flex items-center mb-4">
-          <img src="images/red.png" alt="Farmer Icon" class="w-10 h-10" />
-          <p class="ml-4">
-            Consider light irrigation, especially for crops that require
-            consistent moisture.
-          </p>
+        <div class="flex items-start">
+          <img src="images/red.png" alt="Farmer Icon" class="w-10 h-10 mt-1" />
+          <div class="ml-4 ai-advice" id="aiAdviceContent">
+            <!-- AI-generated content will be inserted here -->
+            <p class="text-gray-600">Loading advice...</p>
+          </div>
         </div>
       </div>
+
       <div class="bg-blue-200 p-4 rounded-lg shadow-md mt-8">
         <div class="flex items-center mb-4">
           <img src="images/red.png" alt="Farmer Icon" class="w-10 h-10" />
-          <p class="ml-4">
-            Consider baby irrigation, especially for crops that require
-            consistent moisture.
-          </p>
+          <div class="ml-4 ai-advice" id="aiAdviceContent2">
+            <!-- AI-generated content will be inserted here -->
+            <p class="text-gray-600">Loading advice...</p>
+          </div>
         </div>
       </div>
     </main>
 
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
     <script type="module">
       // Import Firebase modules
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -185,6 +193,7 @@
         getFunctions,
         httpsCallable,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+      import { GoogleGenerativeAI } from "@google/generative-ai";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
@@ -202,105 +211,182 @@
       const functions = getFunctions(app);
       const db = getFirestore(app);
 
-      const userId = localStorage.getItem("userId");
-      const userDetailsDiv = document.getElementById("userDetails");
-      const greetingElement = document.getElementById("greeting");
+      // Store user data globally
+      let globalUserData = null;
 
-      if (userId) {
-        getDoc(doc(db, "user_data", userId))
-          .then((docSnap) => {
-            if (docSnap.exists()) {
-              const userData = docSnap.data();
-              console.log("User Data:", userData);
-              userDetailsDiv.innerHTML = `
-                  <img src="images/woman.png" alt="Farmer Avatar" class="w-20 h-20 rounded-full">
-                  <div class="ml-4 flex flex-col items-start">
-                      <span class="text-2xl font-bold agrovest-text-green">Hi, ${userData.fullName}!</span>
-                      <h3 id="greeting" class="text-2xl font-medium"></h3>
-                  </div>
-                `;
+      function formatText(text) {
+        text = text.replace(/## (.*?)(\n|$)/g, "<b>$1</b>$2");
+        text = text.replace(/\*\*(.*?)\*\*/g, "<h4>$1</h4>");
+        text = text.replace(/^\* (.*?)(\n|$)/gm, "<li>$1</li>");
+        if (/<li>.*<\/li>/s.test(text)) {
+          text = text.replace(/(<li>.*?<\/li>)/gs, "<ul>$1</ul>");
+        }
+        text = text.replace(/\*/g, "");
+        text = text.replace(/(\d+\. )/g, "<br>$1");
+        return text;
+      }
 
-              // Re-select greetingElement after updating innerHTML
-              const greetingElement = document.getElementById("greeting");
+      async function processWithAI(userData, weatherData) {
+        try {
+          const bigdata = {
+            user: userData,
+            weather: weatherData,
+          };
+          console.log("Combined data for AI:", bigdata);
 
-              // Get the current hour
-              const currentHour = new Date().getHours();
-              let greeting = "";
-
-              if (currentHour < 12) {
-                greeting = "Good Morning";
-              } else if (currentHour < 18) {
-                greeting = "Good Afternoon";
-              } else {
-                greeting = "Good Evening";
-              }
-              greetingElement.textContent = greeting;
-            } else {
-              console.error("User data not found in Firestore.");
-              window.location.href = "profile.html";
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching user data:", error);
+          const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw";
+          const genAI = new GoogleGenerativeAI(API_KEY);
+          const model = genAI.getGenerativeModel({
+            model: "tunedModels/weatheradvice-e52rsxj24rs2",
+            generationConfig: {
+              maxOutputTokens: 2000,
+              temperature: 0.5,
+            },
           });
-      } else {
-        // Redirect if userId is not in localStorage
-        window.location.href = "signup.html";
+
+          const prompt1 = JSON.stringify({ ...bigdata, suffix: "advice 1" });
+          const airesult1 = await model.generateContent(prompt1);
+          const airesponse1 = await airesult1.response;
+          const text1 = await airesponse1.text();
+          const formattedText1 = formatText(text1);
+
+          const season = calculateSeason();
+          const seasonal = `Current Season in your country: ${season}`;
+          const country = `User Country is Nigeria`;
+          const prompt2 = JSON.stringify({ ...bigdata, seasonal, country });
+          console.log(prompt2);
+          const airesult2 = await model.generateContent(prompt2);
+          const airesponse2 = await airesult2.response;
+          const text2 = await airesponse2.text();
+          const formattedText2 = formatText(text2);
+
+          const aiAdviceContent = document.getElementById("aiAdviceContent");
+          aiAdviceContent.innerHTML = formattedText1;
+
+          const aiAdviceContent2 = document.getElementById("aiAdviceContent2");
+          aiAdviceContent2.innerHTML = formattedText2;
+
+          return [formattedText1, formattedText2];
+        } catch (error) {
+          console.error("Error processing AI:", error);
+          const aiAdviceContent = document.getElementById("aiAdviceContent");
+          aiAdviceContent.innerHTML =
+            '<p class="text-red-600">Unable to load farming advice at this time. Please try again later.</p>';
+
+          const aiAdviceContent2 = document.getElementById("aiAdviceContent2");
+          aiAdviceContent2.innerHTML =
+            '<p class="text-red-600">Unable to load farming advice at this time. Please try again later.</p>';
+
+          throw error;
+        }
+      }
+
+      async function handleWeatherData(position) {
+        try {
+          const getWeather = httpsCallable(functions, "getWeather");
+          const result = await getWeather({
+            lat: position.coords.latitude.toString(),
+            lon: position.coords.longitude.toString(),
+          });
+
+          console.log("Weather Data:", result.data);
+          const weatherData = result.data;
+
+          // Update UI elements
+          const todayDateElement = document.getElementById("todayDate");
+          todayDateElement.textContent = new Date().toLocaleDateString(
+            "en-US",
+            {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            }
+          );
+
+          const todayTempElement = document.getElementById("todayTemp");
+          const tempCelsius = Math.round(weatherData.main.temp - 273.15);
+          todayTempElement.textContent = `${tempCelsius}°C`;
+
+          const todayLocationElement = document.getElementById("todayLocation");
+          todayLocationElement.textContent = weatherData.name;
+
+          const todayWeatherIconElement =
+            document.getElementById("todayWeatherIcon");
+          const weatherIconCode = weatherData.weather[0].icon;
+          todayWeatherIconElement.src = `https://openweathermap.org/img/wn/${weatherIconCode}@2x.png`;
+          todayWeatherIconElement.alt = weatherData.weather[0].description;
+
+          // Process with AI if we have user data
+          if (globalUserData) {
+            await processWithAI(globalUserData, weatherData);
+          }
+        } catch (error) {
+          console.error("Error fetching weather data:", error);
+          const todayTempElement = document.getElementById("todayTemp");
+          todayTempElement.textContent = "Weather data unavailable";
+        }
+      }
+
+      async function getUserData() {
+        const userId = localStorage.getItem("userId");
+        const userDetailsDiv = document.getElementById("userDetails");
+        const greetingElement = document.getElementById("greeting");
+
+        if (!userId) {
+          window.location.href = "signup.html";
+          return;
+        }
+
+        try {
+          const docSnap = await getDoc(doc(db, "user_data", userId));
+          if (docSnap.exists()) {
+            globalUserData = docSnap.data();
+            console.log("User Data:", globalUserData);
+
+            userDetailsDiv.innerHTML = `
+        <img src="images/woman.png" alt="Farmer Avatar" class="w-20 h-20 rounded-full">
+        <div class="ml-4 flex flex-col items-start">
+          <span class="text-2xl font-bold agrovest-text-green">Hi, ${globalUserData.fullName}!</span>
+          <h3 id="greeting" class="text-2xl font-medium"></h3>
+        </div>
+      `;
+
+            const updatedGreetingElement = document.getElementById("greeting");
+            const currentHour = new Date().getHours();
+            let greeting = "";
+
+            if (currentHour < 12) {
+              greeting = "Good Morning";
+            } else if (currentHour < 18) {
+              greeting = "Good Afternoon";
+            } else {
+              greeting = "Good Evening";
+            }
+            updatedGreetingElement.textContent = greeting;
+          } else {
+            console.error("User data not found in Firestore.");
+            window.location.href = "profile.html";
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       }
 
       window.addEventListener("DOMContentLoaded", async () => {
+        await getUserData();
+
+        const season = calculateSeason();
+        const seasonal = `Current Season: ${season}`;
+        const seasonElement = document.querySelector(
+          ".crop-growth-monitor .text p"
+        );
+        seasonElement.textContent = `Current Season: ${season}`;
+
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            async (position) => {
-              const lat = position.coords.latitude;
-              const lon = position.coords.longitude;
-
-              try {
-                // Call the Cloud Function for weather data
-                const getWeather = httpsCallable(functions, "getWeather");
-                const result = await getWeather({
-                  lat: lat.toString(),
-                  lon: lon.toString(),
-                });
-
-                console.log("Weather Data:", result.data);
-                const weatherData = result.data;
-                const todayDateElement = document.getElementById("todayDate");
-                todayDateElement.textContent = new Date().toLocaleDateString(
-                  "en-US",
-                  {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                  }
-                );
-
-                // Update temperature (convert Kelvin to Celsius)
-                const todayTempElement = document.getElementById("todayTemp");
-                const tempCelsius = Math.round(weatherData.main.temp - 273.15);
-                todayTempElement.textContent = `${tempCelsius}°C`;
-
-                // Update location
-                const todayLocationElement =
-                  document.getElementById("todayLocation");
-                todayLocationElement.textContent = weatherData.name;
-
-                // Update weather icon
-                const todayWeatherIconElement =
-                  document.getElementById("todayWeatherIcon");
-                const weatherIconCode = weatherData.weather[0].icon;
-                todayWeatherIconElement.src = `https://openweathermap.org/img/wn/${weatherIconCode}@2x.png`;
-                todayWeatherIconElement.alt =
-                  weatherData.weather[0].description;
-              } catch (error) {
-                console.error("Error fetching weather data:", error);
-                const todayTempElement = document.getElementById("todayTemp");
-                todayTempElement.textContent = "Weather data unavailable";
-              }
-            },
+            handleWeatherData,
             (error) => {
               console.error("Geolocation error:", error);
-              // Handle geolocation errors
               const todayTempElement = document.getElementById("todayTemp");
               todayTempElement.textContent = "Location access denied";
             }
@@ -311,6 +397,22 @@
           todayTempElement.textContent = "Geolocation not supported";
         }
       });
+
+      function calculateSeason() {
+        const dateObj = new Date();
+        const month = dateObj.getUTCMonth() + 1;
+        console.log(month);
+
+        // Check if it's rainy season (April to September)
+        if (month >= 3 && month <= 8) {
+          return "Rainy Season";
+        }
+
+        // Check if it's dry season (December to March)
+        if (month >= 11 || month <= 2) {
+          return "Dry Season";
+        }
+      }
     </script>
   </body>
 </html>

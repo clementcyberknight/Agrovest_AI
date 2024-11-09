@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agrovest Activity Log</title>
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #d7d2d2;
+        color: #333333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      header {
+        background-color: #1b472a;
+        padding: 10px 20px;
+        text-align: left;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+
+      header .logo img {
+        height: 70px;
+      }
+
+      header nav a {
+        color: #e8d88f;
+        font-size: 18px;
+        text-decoration: none;
+        padding: 5px;
+        cursor: pointer;
+      }
+
+      main {
+        width: 100%;
+        max-width: 800px;
+        margin: 100px auto 20px;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .activity-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f8f8f8;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        width: 100%;
+        cursor: pointer; /* Changes cursor to pointer for clickable */
+      }
+
+      .date {
+        text-align: center;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 8px;
+        min-width: 80px;
+      }
+
+      .date p {
+        font-size: 12px;
+        color: #666666;
+      }
+
+      .date h2 {
+        font-size: 24px;
+        margin-top: 5px;
+        color: #006400;
+      }
+
+      .activity-description {
+        flex: 1;
+        padding-left: 20px;
+      }
+
+      .activity-description p {
+        font-size: 16px;
+        color: #333333;
+      }
+
+      .fab {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background-color: #1b472a;
+        color: white;
+        font-size: 24px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+      }
+
+      .fab:hover {
+        background-color: #145a2e;
+      }
+
+      @media screen and (max-width: 600px) {
+        main {
+          padding: 0 10px;
+        }
+
+        .activity-card {
+          padding: 40px;
+        }
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+        font-size: 18px;
+        color: #666;
+      }
+
+      .error {
+        text-align: center;
+        padding: 20px;
+        color: #dc3545;
+        background-color: #f8d7da;
+        border-radius: 8px;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      </div>
+      <nav>
+        <a href="menu.html">Menu</a>
+      </nav>
+    </header>
+
+    <main id="logContainer">
+      <div class="loading">Loading logs...</div>
+    </main>
+
+    <a href="farmLog_input.html" class="fab">+</a>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const userId = localStorage.getItem("userId");
+
+      // Function to format date
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        const month = date.toLocaleString("default", { month: "long" });
+        const day = date.getDate();
+        return { month, day };
+      }
+
+      // Function to create activity card
+      function createActivityCard(log) {
+        const { month, day } = formatDate(log.date);
+        const cardHTML = `
+                <div class="activity-card" data-log-id="${log.id}">
+                    <div class="date">
+                        <p>${month}</p>
+                        <h2>${day}</h2>
+                    </div>
+                    <div class="activity-description">
+                        <h2>${log.title}</h2>
+                    </div>
+                </div>
+            `;
+        return cardHTML;
+      }
+
+      // Function to fetch and display logs (optimized with batch fetch)
+      async function displayLogs() {
+        const logContainer = document.getElementById("logContainer");
+
+        try {
+          if (!userId) {
+            window.location.href = "login.html";
+            throw new Error("User not logged in");
+          }
+
+          const userWrittenLogsRef = doc(db, "farmers_written_log", userId);
+          const userWrittenLogsDoc = await getDoc(userWrittenLogsRef);
+
+          if (!userWrittenLogsDoc.exists()) {
+            logContainer.innerHTML =
+              '<p class="error">No logs found. Click the + button to add your first log.</p>';
+            return;
+          }
+
+          const logIds = userWrittenLogsDoc.data().logIds || [];
+          if (logIds.length === 0) {
+            logContainer.innerHTML =
+              '<p class="error">No logs found. Click the + button to add your first log.</p>';
+            return;
+          }
+
+          const logsRef = collection(db, "farmers_log");
+          const querySnapshot = await getDocs(logsRef);
+          let logs = [];
+
+          querySnapshot.forEach((doc) => {
+            if (logIds.includes(doc.id)) {
+              logs.push({ id: doc.id, ...doc.data() });
+            }
+          });
+
+          logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+          logContainer.innerHTML = "";
+
+          logs.forEach((log) => {
+            const cardHTML = createActivityCard(log);
+            logContainer.innerHTML += cardHTML;
+          });
+
+          // Add click event listener to each activity card
+          document.querySelectorAll(".activity-card").forEach((card) => {
+            card.addEventListener("click", () => {
+              const logId = card.getAttribute("data-log-id");
+              sessionStorage.setItem("logId", logId);
+              window.location.href = "ViewFarmLog.html";
+            });
+          });
+        } catch (error) {
+          console.error("Error fetching logs:", error);
+          logContainer.innerHTML = `<p class="error">Error loading logs: ${error.message}</p>`;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", displayLogs);
+    </script>
+  </body>
+</html>

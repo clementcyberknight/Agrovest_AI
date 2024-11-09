@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log Details</title>
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #d7d2d2;
+        color: #333333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      header {
+        background-color: #1b472a;
+        padding: 10px 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo img {
+        height: 70px;
+      }
+
+      .back-button {
+        background-color: #1b472a;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-left: auto;
+      }
+
+      .back-button:hover {
+        background-color: #145a2e;
+      }
+
+      .log-details {
+        margin-top: 80px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+      }
+
+      .log-details h2 {
+        color: #006400;
+      }
+
+      .log-details p {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      </div>
+      <button class="back-button" onclick="window.history.back()">Back</button>
+    </header>
+
+    <div class="log-details" id="logDetailsContainer">
+      <h2>Loading log details...</h2>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      async function displayLogDetails() {
+        const logId = sessionStorage.getItem("logId");
+        const logDetailsContainer = document.getElementById(
+          "logDetailsContainer"
+        );
+
+        try {
+          if (!logId) {
+            logDetailsContainer.innerHTML =
+              '<p class="error">Log ID not found.</p>';
+            return;
+          }
+
+          const logRef = doc(db, "farmers_log", logId);
+          const logDoc = await getDoc(logRef);
+
+          if (!logDoc.exists()) {
+            logDetailsContainer.innerHTML =
+              '<p class="error">Log not found.</p>';
+            return;
+          }
+
+          const logData = logDoc.data();
+          logDetailsContainer.innerHTML = `
+            <h2>${logData.title}</h2>
+            <p><strong>Date:</strong> ${logData.date}</p>
+            <p><strong>Details:</strong> ${logData.observations}</p>
+            <p><strong>Observation:</strong> ${logData.activities}</p>
+          `;
+        } catch (error) {
+          console.error("Error fetching log details:", error);
+          logDetailsContainer.innerHTML = `<p class="error">Error loading log details: ${error.message}</p>`;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", displayLogDetails);
+    </script>
+  </body>
+</html>

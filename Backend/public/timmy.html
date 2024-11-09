@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bernice - 3M-Secure</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Roboto", sans-serif;
+      }
+
+      body,
+      html {
+        height: 100%;
+        background-color: #dcdce7;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background-color: #1b472a;
+        padding: 10px 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        height: 90px; /* Fixed height for header */
+      }
+
+      header .logo img {
+        height: 70px;
+      }
+
+      /* Main content area */
+      .main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        margin-top: 90px; /* Match header height */
+        margin-bottom: 80px; /* Space for search box */
+        position: relative;
+        height: calc(100vh - 170px); /* Subtract header and search box height */
+        overflow-y: auto;
+      }
+
+      .chat-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom: 20px;
+      }
+
+      header nav a {
+        color: #e8d88f;
+        font-size: 18px;
+        text-decoration: none;
+        padding: 5px;
+        margin-left: 15px;
+        transition: color 0.3s;
+      }
+
+      header nav a:hover {
+        color: #fff;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      @media (min-width: 600px) {
+        .nav ul {
+          padding: 10px;
+        }
+      }
+
+      .nav li {
+        margin-right: 40px;
+      }
+
+      .nav a {
+        font-family: "Roboto", sans-serif;
+        color: #fff;
+        font-size: 18px;
+        transition: color 0.3s ease;
+        text-decoration: none;
+        position: relative;
+      }
+
+      .nav a::after {
+        content: "";
+        width: 0;
+        height: 2px;
+        background-color: #28a745;
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        transition: width 0.3s;
+      }
+
+      .nav a:hover::after {
+        width: 100%;
+      }
+
+      .nav a:hover {
+        color: #28a745;
+      }
+
+      .markdown {
+        line-height: 1.6;
+        font-size: 16px;
+      }
+
+      .markdown h2 {
+        font-size: 1.5em;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .markdown ul {
+        margin-left: 20px;
+        list-style-type: disc;
+      }
+
+      .markdown li {
+        margin-bottom: 5px;
+      }
+
+      .markdown strong {
+        font-weight: bold;
+      }
+
+      .markdown em {
+        font-style: italic;
+      }
+
+      .markdown div {
+        margin-bottom: 10px;
+      }
+
+      .search-box {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #ffffff;
+        padding: 15px 20px;
+        border-radius: 25px;
+        margin: 10px 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .search-box textarea {
+        flex: 1;
+        border: none;
+        background: none;
+        margin-left: 10px;
+        outline: none;
+        font-size: 17px;
+        resize: none;
+        height: 30px;
+        overflow: hidden;
+        transition: height 0.2s ease;
+      }
+
+      .search-box img {
+        width: 24px;
+        cursor: pointer;
+      }
+
+      .message {
+        margin: 10px 5px;
+        padding: 15px;
+        border-radius: 10px;
+        color: white;
+        max-width: 80%;
+      }
+
+      .user-message {
+        background-color: #2196f3;
+        text-align: right;
+        margin-left: auto;
+      }
+
+      .ai-response {
+        background-color: #47a075;
+        text-align: left;
+        margin-right: auto;
+      }
+
+      .skeleton-loading {
+        display: none;
+      }
+
+      .skeleton-loading.active {
+        display: block;
+      }
+
+      .skeleton-loading .message {
+        background-color: #a1a1a1;
+        /* Gray background */
+        animation: pulse 1.5s infinite;
+        /* Animation */
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+
+        50% {
+          opacity: 0.9;
+        }
+
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      .message-label {
+        font-size: 10px;
+        opacity: 0.8;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: auto;
+        padding: 5px;
+        font-size: 14px;
+      }
+
+      .footer a {
+        color: #4a90e2;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .settings-icon {
+        border: none;
+        background: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .settings-icon img {
+        height: 24px;
+        cursor: pointer;
+        transition: transform 0.5s;
+      }
+
+      .rotate {
+        animation: rotate360 0.5s;
+      }
+
+      @keyframes rotate360 {
+        from {
+          transform: rotate(0deg);
+        }
+
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .settings-menu {
+        display: none;
+        position: absolute;
+        right: 50px;
+        padding: 15px;
+        top: 60px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        z-index: 1001;
+      }
+
+      .settings-menu a {
+        display: block;
+        padding: 20px 50px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .settings-menu a:hover {
+        background-color: #f0f4f8;
+      }
+
+      ::-webkit-scrollbar {
+        width: 0; /* Remove scrollbar width */
+        background: transparent; /* Optional: for older browsers */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: transparent;
+      }
+
+      /* For Firefox */
+      * {
+        scrollbar-width: none;
+      }
+      .main,
+      .chat-container {
+        -ms-overflow-style: none; /* For Internet Explorer and Edge */
+        scrollbar-width: none; /* For Firefox */
+      }
+
+      .main::-webkit-scrollbar,
+      .chat-container::-webkit-scrollbar {
+        display: none; /* For Chrome, Safari and Opera */
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      </div>
+      <nav>
+        <a href="menu.html">Menu</a>
+      </nav>
+    </header>
+    <div class="main">
+      <div class="chat-container" id="message-area">
+        <!-- Messages will appear here -->
+      </div>
+      <div class="skeleton-loading" id="skeleton-loading">
+        <div class="message markdown"></div>
+        <div class="message markdown"></div>
+        <div class="message markdown"></div>
+      </div>
+      <div class="search-box">
+        <textarea
+          placeholder="Enter Prompt Here"
+          id="user-input"
+          rows="1"
+        ></textarea>
+        <img src="images/send.png" alt="Send Button" class="send-button" />
+      </div>
+    </div>
+    <script>
+      window.toggleSettingsMenu = function () {
+        const settingsMenu = document.getElementById("settingsMenu");
+        const menuIcon = document.getElementById("menuIcon");
+        const isOpen = settingsMenu.style.display === "block";
+        settingsMenu.style.display = isOpen ? "none" : "block";
+        menuIcon.classList.add("rotate");
+        setTimeout(() => menuIcon.classList.remove("rotate"), 500);
+      };
+      const userID = sessionStorage.getItem("userID");
+
+      if (!userID) {
+        //window.location.href = "login.html";
+      }
+    </script>
+    <script type="module">
+      import {
+        GoogleGenerativeAI,
+        HarmBlockThreshold,
+        HarmCategory,
+      } from "https://esm.run/@google/generative-ai";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db = getFirestore(app);
+      const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw";
+      const genAI = new GoogleGenerativeAI(API_KEY);
+
+      let globalUserData = null;
+      let userLogs = [];
+
+      const userInput = document.getElementById("user-input");
+      const safetySettings = [
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+      ];
+
+      let chat;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const userID = localStorage.getItem("userID");
+        if (!userID) {
+          window.location.href = "login.html";
+          welcomeUser();
+          startChat();
+        } else {
+          welcomeUser();
+          startChat();
+        }
+      });
+
+      function welcomeUser() {
+        const welcomeMessage = `Hello! I'm Farmer Timmy, Your Personal Agronomist, How can i help you today.`;
+        displayMessage(welcomeMessage, "ai-response", "AI Response");
+      }
+
+      async function startChat() {
+        const userData = await getUserData();
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+          systemInstruction: `You are Farmer Timmy, an expert agronomist who assists users with farming, crop management, and agricultural questions. Your role is to provide clear, accurate, and practical advice to help users with their farming needs. Answer questions in a friendly and helpful tone, focusing on best practices in farming, pest control, soil health, crop rotation, and sustainable agriculture. Use simple language and you can something user nigeria pidgin language to converse, avoid technical jargon unless necessary, and tailor your responses to farmers or users with varying levels of experience in agriculture.`,
+          safetySettings,
+        });
+        chat = model.startChat({
+          history: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `before we start a conversation this is all the data you need to know about me to help assist me better:  ${JSON.stringify(
+                    userData
+                  )}`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.5,
+            topP: 0.95,
+            topK: 64,
+            maxOutputTokens: 30000,
+            responseMimeType: "text/plain",
+          },
+        });
+      }
+
+      async function getUserData() {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          window.location.href = "login.html";
+          alert("Please log in.");
+          return null;
+        }
+
+        try {
+          const userRef = doc(db, "user_data", userId);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            globalUserData = userSnap.data();
+            console.log("User Data:", globalUserData);
+          } else {
+            console.error("User data not found for ID:", userId);
+          }
+
+          // Fetch all farm logs for the user
+          const userWrittenLogsRef = doc(db, "farmers_written_log", userId);
+          const userWrittenLogsDoc = await getDoc(userWrittenLogsRef);
+
+          if (!userWrittenLogsDoc.exists()) {
+            userLogs = [];
+          } else {
+            const logIds = userWrittenLogsDoc.data().logIds || [];
+            if (logIds.length === 0) {
+              userLogs = [];
+            } else {
+              const logsRef = collection(db, "farmers_log");
+              const querySnapshot = await getDocs(logsRef);
+              userLogs = querySnapshot.docs
+                .filter((doc) => logIds.includes(doc.id))
+                .map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                }));
+            }
+          }
+
+          console.log("User Logs:", userLogs);
+
+          return { userData: globalUserData, logs: userLogs };
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          return null; // Indicate failure
+        }
+      }
+
+      async function runChat(prompt) {
+        const skeletonLoading = document.getElementById("skeleton-loading");
+        skeletonLoading.classList.add("active"); // Show skeleton loading
+
+        try {
+          const result = await chat.sendMessage(prompt);
+          const response = await result.response;
+          const text = response.text();
+
+          displayMessage(text, "ai-response", "AI Response");
+        } catch (error) {
+          console.error("Error generating content:", error);
+          displayMessage(
+            "Sorry, there was an error processing your request due to safety concern. Please try again later.",
+            "ai-response",
+            "AI Response"
+          );
+        } finally {
+          skeletonLoading.classList.remove("active"); // Hide skeleton loading after response
+        }
+      }
+
+      document
+        .querySelector(".send-button")
+        .addEventListener("click", handleMessage);
+      document;
+      document
+        .querySelector("#user-input")
+        .addEventListener("keypress", function (event) {
+          if (event.key === "Enter" && event.shiftKey) {
+            event.preventDefault(); // Prevent newline on Enter
+            handleMessage();
+          } else if (event.key === "Enter" && !event.shiftKey) {
+            this.style.height = "50px"; // Adjust height to fit two lines
+          }
+        });
+
+      document
+        .querySelector("#user-input")
+        .addEventListener("input", function () {
+          if (this.value.indexOf("\n") === -1) {
+            this.style.height = "30px"; // Reset to initial height if no newline
+          }
+        });
+
+      async function handleMessage() {
+        const inputField = document.getElementById("user-input");
+        const prompt = inputField.value.trim();
+        if (prompt !== "") {
+          displayMessage(prompt, "user-message", "User");
+          inputField.value = ""; // Clear input field
+          await runChat(prompt);
+        }
+      }
+
+      function displayMessage(messageText, cssClass, label) {
+        const messageArea = document.getElementById("message-area");
+        let messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", cssClass, "markdown");
+
+        let textNode = document.createElement("div");
+        // Convert markdown to HTML
+        textNode.innerHTML = markdownToHTML(messageText);
+
+        messageDiv.appendChild(textNode);
+        messageArea.appendChild(messageDiv);
+
+        // Scroll to the bottom of the message area
+        messageArea.scrollTop = messageArea.scrollHeight;
+      }
+
+      function markdownToHTML(markdown) {
+        return markdown
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // bold
+          .replace(/\*(.*?)\*/g, "<em>$1</em>") // italic
+          .replace(/\n/g, "<br>"); // line breaks
+      }
+      userInput.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
+    </script>
+  </body>
+</html>

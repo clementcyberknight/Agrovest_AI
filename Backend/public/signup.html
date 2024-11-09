@@ -174,6 +174,7 @@
         getAuth,
         createUserWithEmailAndPassword,
         GoogleAuthProvider,
+        FacebookAuthProvider,
         signInWithPopup,
         sendEmailVerification,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -190,6 +191,8 @@
 
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
+      const provider = new FacebookAuthProvider(); // Facebook provider
+      const googleProvider = new GoogleAuthProvider(); // Google Provider
 
       const emailInput = document.getElementById("email");
       const passwordInput = document.getElementById("password");
@@ -278,7 +281,6 @@
       });
 
       googleSignInButton.addEventListener("click", () => {
-        const provider = new GoogleAuthProvider();
         signInWithPopup(auth, provider)
           .then((result) => {
             const user = result.user;
@@ -292,30 +294,19 @@
           });
       });
 
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId: "YOUR_FACEBOOK_APP_ID", // Replace with your Facebook App ID
-          cookie: true,
-          xfbml: true,
-          version: "v17.0",
-        });
-
-        facebookSignInButton.addEventListener("click", function () {
-          showAlert("warning", "Facebook sign-up is currently unavailable.");
-        });
-      };
-
-      (function (d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-          return;
-        }
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, "script", "facebook-jssdk");
+      facebookSignInButton.addEventListener("click", () => {
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            const user = result.user;
+            console.log("User signed in with Facebook:", user);
+            localStorage.setItem("userId", user.uid);
+            window.location.href = "profile.html"; // Redirect to profile page
+          })
+          .catch((error) => {
+            console.error("Error signing in with Facebook:", error);
+            showAlert("danger", error.message);
+          });
+      });
     </script>
   </body>
 </html>

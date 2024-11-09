@@ -168,8 +168,9 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import {
         getAuth,
-        signInWithEmailAndPassword,
+        FacebookAuthProvider,
         GoogleAuthProvider,
+        signInWithEmailAndPassword,
         signInWithPopup,
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
@@ -185,6 +186,7 @@
 
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
+      const provider = new FacebookAuthProvider();
 
       const emailInput = document.getElementById("email");
       const passwordInput = document.getElementById("password");
@@ -276,41 +278,25 @@
           });
       });
 
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId: "YOUR_FACEBOOK_APP_ID",
-          cookie: true,
-          xfbml: true,
-          version: "v17.0",
-        });
+      facebookSignInButton.addEventListener("click", () => {
+        const provider = new FacebookAuthProvider();
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            const user = result.user;
+            console.log(user);
+            const credential =
+              FacebookAuthProvider.credentialFromResult(result);
+            const accessToken = credential.accessToken;
 
-        facebookSignInButton.addEventListener("click", function () {
-          FB.login(
-            function (response) {
-              if (response.authResponse) {
-                console.log("Facebook login successful", response);
-                window.location.href = "dashboard.html";
-              } else {
-                console.log("Facebook login cancelled");
-                showAlert("danger", "Facebook login cancelled.");
-              }
-            },
-            { scope: "email" }
-          );
-        });
-      };
-
-      (function (d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-          return;
-        }
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, "script", "facebook-jssdk");
+            console.log("User signed in with Facebook:", user);
+            localStorage.setItem("userId", user.uid);
+            window.location.href = "dashboard.html";
+          })
+          .catch((error) => {
+            console.error("Error signing in with Facebook:", error);
+            showAlert("danger", error.message);
+          });
+      });
     </script>
   </body>
 </html>
