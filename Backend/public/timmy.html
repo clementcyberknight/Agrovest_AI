@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bernice - 3M-Secure</title>
+    <title>Timmy - Agrovest</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
@@ -391,11 +391,6 @@
         menuIcon.classList.add("rotate");
         setTimeout(() => menuIcon.classList.remove("rotate"), 500);
       };
-      const userID = sessionStorage.getItem("userID");
-
-      if (!userID) {
-        //window.location.href = "login.html";
-      }
     </script>
     <script type="module">
       import {
@@ -442,9 +437,9 @@
       ];
 
       let chat;
+      const userID = localStorage.getItem("userId");
 
       document.addEventListener("DOMContentLoaded", function () {
-        const userID = localStorage.getItem("userID");
         if (!userID) {
           window.location.href = "login.html";
           welcomeUser();
@@ -464,7 +459,7 @@
         const userData = await getUserData();
         const model = genAI.getGenerativeModel({
           model: "gemini-1.5-flash",
-          systemInstruction: `You are Farmer Timmy, an expert agronomist who assists users with farming, crop management, and agricultural questions. Your role is to provide clear, accurate, and practical advice to help users with their farming needs. Answer questions in a friendly and helpful tone, focusing on best practices in farming, pest control, soil health, crop rotation, and sustainable agriculture. Use simple language and you can something user nigeria pidgin language to converse, avoid technical jargon unless necessary, and tailor your responses to farmers or users with varying levels of experience in agriculture.`,
+          systemInstruction: `You are Farmer Timmy, an expert agronomist who assists users with farming, crop management, and agricultural questions. Your role is to provide clear, accurate, and practical advice to help users with their farming needs. Answer questions in a friendly and helpful tone, focusing on best practices in farming, pest control, soil health, crop rotation, and sustainable agriculture. Use simple language and you should only use nigeria pidgin language to converse if the user use nigeria pidgin to ask you question, avoid technical jargon unless necessary, and tailor your responses to farmers or users with varying levels of experience in agriculture.`,
           safetySettings,
         });
         chat = model.startChat({
@@ -493,7 +488,6 @@
       async function getUserData() {
         const userId = localStorage.getItem("userId");
         if (!userId) {
-          window.location.href = "login.html";
           alert("Please log in.");
           return null;
         }

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Predicting Crop Yield</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #1b4d2e;
+        padding-top: 80px;
+      }
+
+      .header {
+        width: 100%;
+        padding: 1rem;
+        background-color: #1b4d2e;
+        color: #d4af37;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+      }
+
+      .header img {
+        height: 60px;
+      }
+
+      .header .menu {
+        font-size: 1.5rem;
+        font-weight: 100;
+        text-decoration: none;
+        color: #d4af37;
+      }
+
+      .content {
+        text-align: center;
+        margin-top: 2rem;
+      }
+
+      .content img {
+        width: 100px;
+        height: auto;
+        margin-top: 1rem;
+      }
+
+      .content h2 {
+        font-size: 1.75rem;
+        margin: 1rem 0;
+        color: #333;
+      }
+
+      .loading-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #1b4d2e;
+        opacity: 0.3;
+        animation: blink 1.5s infinite ease-in-out;
+      }
+
+      .dot:nth-child(1) {
+        animation-delay: 0s;
+        background-color: #92c292;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.3s;
+        background-color: #1b4d2e;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.6s;
+        background-color: #7b7b7b;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      <a href="menu.html" class="menu">Menu</a>
+    </header>
+
+    <div class="content">
+      <h2>Predicting Crop Yield...</h2>
+      <img src="images/brain.png" alt="Brain Icon" />
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+    <script type="module">
+      import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+      import {
+        getFunctions,
+        httpsCallable,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        getDoc,
+        collection,
+        addDoc,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db = getFirestore(app);
+      const functions = getFunctions(app);
+      const userId = localStorage.getItem("userId");
+
+      const soilProperties = [
+        "aluminium_extractable",
+        "phosphorous_extractable",
+        "potassium_extractable",
+        "carbon_organic",
+        "ph",
+        "texture_class",
+        "calcium_extractable",
+        "magnesium_extractable",
+        "nitrogen_total",
+        "bulk_density",
+        "cation_exchange_capacity",
+        "sand_content",
+        "silt_content",
+        "clay_content",
+        "bedrock_depth",
+      ];
+
+      let globalUserData = null;
+      let userLogs = [];
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        const userData = await getUserData();
+
+        if (userData) {
+          globalUserData = userData.userData;
+          userLogs = userData.logs;
+        }
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+
+              let allResults = {};
+
+              try {
+                for (const property of soilProperties) {
+                  const getSoilInformation = httpsCallable(
+                    functions,
+                    "getSoilInformation"
+                  );
+                  const result = await getSoilInformation({
+                    lat,
+                    lon,
+                    property,
+                  });
+                  allResults[property] = result.data;
+                }
+
+                if (userId) {
+                  await setDoc(doc(db, "soil_result", userId), allResults);
+                } else {
+                  console.error("User ID not found in local storage");
+                }
+
+                // Send data to AI for analysis and report generation
+                await generateCropYieldPrediction(allResults);
+              } catch (error) {
+                console.error("Error fetching soil data:", error);
+              }
+            },
+            (error) => {
+              console.error("Geolocation error:", error);
+            }
+          );
+        }
+      });
+
+      async function getUserData() {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          alert("Please log in.");
+          return null;
+        }
+
+        try {
+          const userRef = doc(db, "user_data", userId);
+          const userSnap = await getDoc(userRef);
+          globalUserData = userSnap.exists() ? userSnap.data() : null;
+
+          const userWrittenLogsRef = doc(db, "farmers_written_log", userId);
+          const userWrittenLogsDoc = await getDoc(userWrittenLogsRef);
+
+          userLogs = userWrittenLogsDoc.exists()
+            ? userWrittenLogsDoc.data().logs
+            : [];
+
+          return { userData: globalUserData, logs: userLogs };
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          return null;
+        }
+      }
+
+      async function generateCropYieldPrediction(soilData) {
+        const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw";
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+          systemInstruction: `Generate a detailed crop yield prediction for the farmer, analyzing historical logs, user data, soil quality, and seasonal factors for the specific crop planted. Assess soil and environmental conditions, and, if yield is predicted to be poor, provide targeted recommendations to improve it. Structure the report into sections covering: (1) Current Soil and Crop Condition Analysis, (2) calculate yield prediction then gie user the prediction of his crop yield with explanation, and (3) Improvement Recommendations. Offer practical, step-by-step guidance on enhancing soil health and maximizing yield, using clear, actionable advice based on the analysis.`,
+          generationConfig: {
+            candidateCount: 1,
+            maxOutputTokens: 20000,
+            temperature: 0.5,
+          },
+        });
+
+        const prompt = JSON.stringify({ globalUserData, userLogs, soilData });
+        const result = await model.generateContent(prompt);
+        const report = await result.response.text();
+
+        if (userId) {
+          const reportData = {
+            userId,
+            report,
+            timestamp: new Date(),
+          };
+          const docRef = await addDoc(
+            collection(db, "user_Crop_Yield_Prediction"),
+            reportData
+          );
+          sessionStorage.setItem("reportDocId", docRef.id);
+          window.location.href = "prediction_report.html";
+        } else {
+          console.error("User ID not found in local storage");
+        }
+      }
+    </script>
+  </body>
+</html>
