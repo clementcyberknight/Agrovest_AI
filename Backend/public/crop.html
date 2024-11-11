@@ -326,7 +326,7 @@
           const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw"; // Replace with your actual API key
           const genAI = new GoogleGenerativeAI(API_KEY);
           const model = genAI.getGenerativeModel({
-            model: "tunedModels/devfest-dami-b74777pk6uuq",
+            model: "tunedModels/disease-report-generator-o805a68c1a0e",
             generationConfig: {
               maxOutputTokens: 2000,
               temperature: 0.5,
@@ -347,11 +347,11 @@
               timestamp: new Date(),
             };
             const docRef = await addDoc(
-              collection(db, "user_soilImage_report"),
+              collection(db, "user_plant_report"),
               reportData
             );
             sessionStorage.setItem("reportDocId", docRef.id);
-            //window.location.href = "report.html";
+            window.location.href = "report.html";
             console.log(
               "Report saved to user_report collection with document ID:",
               docRef.id

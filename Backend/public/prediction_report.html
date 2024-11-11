@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Report</title>
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      /* Reset styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body styling */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f3f3;
+        color: #333333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      /* Loading screen */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        color: #fff;
+        font-size: 18px;
+      }
+
+      /* Loader animation */
+      .loader {
+        width: 50px;
+        aspect-ratio: 1;
+        display: grid;
+      }
+
+      .loader::before,
+      .loader::after {
+        content: "";
+        grid-area: 1/1;
+        --c: no-repeat radial-gradient(farthest-side, #25b09b 92%, #0000);
+        background: var(--c) 50% 0, var(--c) 50% 100%, var(--c) 100% 50%,
+          var(--c) 0 50%;
+        background-size: 12px 12px;
+        animation: l12 1s infinite;
+      }
+
+      .loader::before {
+        margin: 4px;
+        filter: hue-rotate(45deg);
+        background-size: 8px 8px;
+        animation-timing-function: linear;
+      }
+
+      @keyframes l12 {
+        100% {
+          transform: rotate(0.5turn);
+        }
+      }
+
+      .loading-message {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      /* Header styling */
+      header {
+        background-color: #1b472a;
+        padding: 10px 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      header .logo img {
+        height: 70px;
+      }
+
+      header nav a {
+        color: #e8d88f;
+        font-size: 18px;
+        text-decoration: none;
+        padding: 5px;
+        margin-left: 15px;
+        transition: color 0.3s;
+      }
+
+      header nav a:hover {
+        color: #fff;
+      }
+
+      /* Main content styling */
+      .container {
+        margin-top: 100px;
+        max-width: 800px;
+        width: 100%;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        font-size: 1.4em;
+        margin-bottom: 12px;
+        color: #006400;
+      }
+
+      ul {
+        list-style-type: disc;
+        margin-left: 20px;
+        padding-left: 0;
+        color: #333333;
+      }
+
+      ul li {
+        margin: 8px 0;
+      }
+
+      /* Call-to-action button */
+      .cta-button {
+        display: inline-block;
+        background-color: #1b472a;
+        color: #ffffff;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 8px;
+        margin: 20px auto 0;
+        cursor: pointer;
+        text-decoration: none;
+        width: 100%;
+        max-width: 250px;
+        transition: background-color 0.3s;
+      }
+
+      .cta-button:hover {
+        background-color: #144a2a;
+      }
+
+      /* Mobile view adjustments */
+      @media (max-width: 600px) {
+        header nav a {
+          font-size: 16px;
+          margin-left: 10px;
+        }
+
+        .container {
+          font-size: 1em;
+          padding: 15px;
+        }
+
+        .loading-message {
+          font-size: 14px;
+        }
+      }
+      .ai-report-loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .ai-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1b472a;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .ai-loading-text {
+        margin-top: 15px;
+        color: #1b472a;
+        font-size: 14px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Hide the loader when content is loaded */
+      .ai-report-loader.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loader"></div>
+      <p class="loading-message">Generating prediction Report...</p>
+    </div>
+
+    <header>
+      <div class="logo">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      </div>
+      <nav>
+        <a href="menu.html">Menu</a>
+      </nav>
+    </header>
+
+    <div class="container" id="container">
+      <h2>Crop Yield Prediction Report</h2>
+      <div class="ai-report-loader" id="aiReportLoader">
+        <div class="ai-spinner"></div>
+        <p class="ai-loading-text">Generating AI Report...</p>
+      </div>
+      <div id="ai-report" style="display: none"></div>
+    </div>
+
+    <script>
+      setTimeout(() => {
+        document.querySelector(".loading-screen").style.display = "none";
+      }, 3000);
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      async function displayReport() {
+        try {
+          const reportDocId = sessionStorage.getItem("reportDocId");
+          if (!reportDocId) {
+            throw new Error("Report document ID not found in session storage.");
+          }
+
+          const reportDocRef = doc(
+            db,
+            "user_Crop_Yield_Prediction",
+            reportDocId
+          );
+          const reportDoc = await getDoc(reportDocRef);
+
+          if (reportDoc.exists()) {
+            const reportData = reportDoc.data();
+            const formattedText = formatText(reportData.report);
+            const aiReportContainer = document.getElementById("ai-report");
+            aiReportContainer.innerHTML = formattedText;
+            aiReportContainer.style.display = "block";
+            document.getElementById("aiReportLoader").classList.add("hidden");
+          } else {
+            throw new Error("Report document not found in Firestore.");
+          }
+        } catch (error) {
+          console.error("Error retrieving report:", error);
+          alert("Failed to retrieve the report. Please try again later.");
+        }
+      }
+
+      function formatText(text) {
+        text = text.replace(/## (.*?)(\n|$)/g, "<b>$1</b>$2");
+        text = text.replace(/\*\*(.*?)\*\*/g, "<h4>$1</h4>");
+        text = text.replace(/^\* (.*?)(\n|$)/gm, "<li>$1</li>");
+        if (/<li>.*<\/li>/s.test(text)) {
+          text = text.replace(/(<li>.*?<\/li>)/gs, "<ul>$1</ul>");
+        }
+        text = text.replace(/\*/g, "");
+        text = text.replace(/(\d+\. )/g, "<br>$1");
+
+        return text;
+      }
+      document.addEventListener("DOMContentLoaded", displayReport);
+    </script>
+  </body>
+</html>
