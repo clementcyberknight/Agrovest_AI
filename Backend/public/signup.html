@@ -191,7 +191,7 @@
 
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
-      const provider = new FacebookAuthProvider(); // Facebook provider
+      const facebookprovider = new FacebookAuthProvider(); // Facebook provider
       const googleProvider = new GoogleAuthProvider(); // Google Provider
 
       const emailInput = document.getElementById("email");
@@ -281,7 +281,7 @@
       });
 
       googleSignInButton.addEventListener("click", () => {
-        signInWithPopup(auth, provider)
+        signInWithPopup(auth, googleProvider)
           .then((result) => {
             const user = result.user;
             console.log("User signed in with Google:", user);
@@ -295,7 +295,7 @@
       });
 
       facebookSignInButton.addEventListener("click", () => {
-        signInWithPopup(auth, provider)
+        signInWithPopup(auth, facebookprovider)
           .then((result) => {
             const user = result.user;
             console.log("User signed in with Facebook:", user);

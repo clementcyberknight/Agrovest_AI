@@ -14,10 +14,12 @@
       href="images/AgroVest (2).png"
       type="image/x-png"
     />
+
     <style>
       .agrovest-green {
         background-color: #1b4d2e;
       }
+
       .agrovest-text-green {
         color: #1b4d2e;
       }
@@ -27,23 +29,7 @@
           max-width: 480px;
         }
       }
-      .error-message {
-        color: red;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-      }
-      .agrovest-green {
-        background-color: #1b4d2e;
-      }
-      .agrovest-text-green {
-        color: #1b4d2e;
-      }
 
-      @media (min-width: 768px) {
-        .login-container {
-          max-width: 480px;
-        }
-      }
       .error-message {
         color: red;
         font-size: 0.875rem;
@@ -83,14 +69,13 @@
       }
 
       .crop-growth-monitor .text h4 {
-        font-size: 2rem; /* Make the h4 bigger */
+        font-size: 2rem;
         font-weight: bold;
         margin-bottom: 0.5rem;
       }
 
       .crop-growth-monitor .text h4 span {
-        /* Target the "10%" specifically */
-        font-size: 3rem; /* Make the "10%" even bigger */
+        font-size: 3rem;
         font-weight: bold;
       }
 
@@ -99,13 +84,111 @@
         color: #6b7280;
         margin: 0;
       }
+
+      .language-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .language-dropdown button {
+        background-color: transparent;
+        color: #fef9c3; /* yellow-100 */
+        padding: 0.5rem 1rem;
+        border: 1px solid #fef9c3;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+      }
+
+      .language-dropdown button:hover {
+        background-color: rgba(254, 249, 195, 0.1);
+      }
+
+      .language-dropdown .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 0.5rem;
+        background-color: white;
+        min-width: 160px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border-radius: 0.375rem;
+        z-index: 50;
+      }
+
+      .language-dropdown .dropdown-content a {
+        color: #1b4d2e;
+        padding: 0.75rem 1rem;
+        text-decoration: none;
+        display: block;
+        transition: background-color 0.2s ease;
+      }
+
+      .language-dropdown .dropdown-content a:hover {
+        background-color: #f3f4f6;
+      }
+
+      .language-dropdown .dropdown-content a:first-child {
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+      }
+
+      .language-dropdown .dropdown-content a:last-child {
+        border-bottom-left-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+      }
+
+      .language-dropdown .show {
+        display: block;
+      }
+
+      /* Hide Google Translate element */
+      #google_translate_element {
+        display: none;
+      }
     </style>
   </head>
   <body class="bg-white min-h-screen">
     <nav class="agrovest-green p-4 flex justify-between items-center">
       <img src="images/AgroVest.png" alt="Agrovest Logo" class="h-16" />
-      <a href="menu.html" class="text-yellow-100 text-center text-xl">Menu</a>
+      <div class="flex items-center gap-6">
+        <a
+          href="menu.html"
+          class="text-yellow-100 text-center text-xl hover:text-yellow-200 transition-colors"
+          >Menu</a
+        >
+        <div class="language-dropdown">
+          <button id="languageButton" class="flex items-center">
+            <span>Language</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+          <div class="dropdown-content" id="languageDropdown">
+            <a href="#" data-lang="en">English</a>
+            <a href="#" data-lang="ig">Igbo</a>
+            <a href="#" data-lang="yo">Yoruba</a>
+            <a href="#" data-lang="ha">Hausa</a>
+          </div>
+        </div>
+      </div>
     </nav>
+    <div id="google_translate_element"></div>
 
     <main class="container mx-auto px-4 py-8">
       <div id="userDetails" class="text-center mb-8 flex items-center">
@@ -146,7 +229,6 @@
         </div>
         <div class="text">
           <h4><span>10</span>% Germination</h4>
-          <!-- Wrap "10%" in a span -->
           <p>Current Plant Season: Rainy Season</p>
         </div>
       </div>
@@ -179,6 +261,67 @@
           "@google/generative-ai": "https://esm.run/@google/generative-ai"
         }
       }
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const languageButton = document.getElementById("languageButton");
+        const languageDropdown = document.getElementById("languageDropdown");
+
+        // Toggle dropdown when clicking the button
+        languageButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          languageDropdown.classList.toggle("show");
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+          if (
+            !languageDropdown.contains(e.target) &&
+            !languageButton.contains(e.target)
+          ) {
+            languageDropdown.classList.remove("show");
+          }
+        });
+
+        // Handle language selection
+        const languageLinks = document.querySelectorAll(
+          ".language-dropdown .dropdown-content a"
+        );
+        languageLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const selectedLang = link.dataset.lang;
+            console.log("Selected language:", selectedLang);
+            languageDropdown.classList.remove("show");
+
+            // Trigger Google Translate
+            const googleFrame = document.querySelector(".goog-te-combo");
+            if (googleFrame) {
+              googleFrame.value = selectedLang;
+              googleFrame.dispatchEvent(new Event("change"));
+            }
+          });
+        });
+      });
+
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "en,ig,yo,ha",
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+            multilingualPage: true,
+          },
+          "google_translate_element"
+        );
+      }
+
+      // Load Google Translate script
+      const translateScript = document.createElement("script");
+      translateScript.src =
+        "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      document.body.appendChild(translateScript);
     </script>
     <script type="module">
       // Import Firebase modules
@@ -251,7 +394,7 @@
           const formattedText1 = formatText(text1);
 
           const season = calculateSeason();
-          const seasonal = `Current Season in your country: ${season}`;
+          const seasonal = `Current Season in your country: $`;
           const country = `User Country is Nigeria`;
           const prompt2 = JSON.stringify({ ...bigdata, seasonal, country });
           console.log(prompt2);
@@ -344,12 +487,12 @@
             console.log("User Data:", globalUserData);
 
             userDetailsDiv.innerHTML = `
-        <img src="images/woman.png" alt="Farmer Avatar" class="w-20 h-20 rounded-full">
-        <div class="ml-4 flex flex-col items-start">
-          <span class="text-2xl font-bold agrovest-text-green">Hi, ${globalUserData.fullName}!</span>
-          <h3 id="greeting" class="text-2xl font-medium"></h3>
-        </div>
-      `;
+                        <img src="images/woman.png" alt="Farmer Avatar" class="w-20 h-20 rounded-full">
+                        <div class="ml-4 flex flex-col items-start">
+                            <span class="text-2xl font-bold agrovest-text-green">Hi, ${globalUserData.fullName}!</span>
+                            <h3 id="greeting" class="text-2xl font-medium"></h3>
+                        </div>
+                    `;
 
             const updatedGreetingElement = document.getElementById("greeting");
             const currentHour = new Date().getHours();
@@ -376,7 +519,7 @@
         await getUserData();
 
         const season = calculateSeason();
-        const seasonal = `Current Season: ${season}`;
+        const seasonal = `Current Season: $`;
         const seasonElement = document.querySelector(
           ".crop-growth-monitor .text p"
         );
