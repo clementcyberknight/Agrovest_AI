@@ -84,74 +84,6 @@
         color: #6b7280;
         margin: 0;
       }
-
-      .language-dropdown {
-        position: relative;
-        display: inline-block;
-      }
-
-      .language-dropdown button {
-        background-color: transparent;
-        color: #fef9c3; /* yellow-100 */
-        padding: 0.5rem 1rem;
-        border: 1px solid #fef9c3;
-        border-radius: 0.375rem;
-        cursor: pointer;
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.2s ease;
-      }
-
-      .language-dropdown button:hover {
-        background-color: rgba(254, 249, 195, 0.1);
-      }
-
-      .language-dropdown .dropdown-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 100%;
-        margin-top: 0.5rem;
-        background-color: white;
-        min-width: 160px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border-radius: 0.375rem;
-        z-index: 50;
-      }
-
-      .language-dropdown .dropdown-content a {
-        color: #1b4d2e;
-        padding: 0.75rem 1rem;
-        text-decoration: none;
-        display: block;
-        transition: background-color 0.2s ease;
-      }
-
-      .language-dropdown .dropdown-content a:hover {
-        background-color: #f3f4f6;
-      }
-
-      .language-dropdown .dropdown-content a:first-child {
-        border-top-left-radius: 0.375rem;
-        border-top-right-radius: 0.375rem;
-      }
-
-      .language-dropdown .dropdown-content a:last-child {
-        border-bottom-left-radius: 0.375rem;
-        border-bottom-right-radius: 0.375rem;
-      }
-
-      .language-dropdown .show {
-        display: block;
-      }
-
-      /* Hide Google Translate element */
-      #google_translate_element {
-        display: none;
-      }
     </style>
   </head>
   <body class="bg-white min-h-screen">
@@ -161,34 +93,22 @@
         <a
           href="menu.html"
           class="text-yellow-100 text-center text-xl hover:text-yellow-200 transition-colors"
+          data-translate
           >Menu</a
         >
-        <div class="language-dropdown">
-          <button id="languageButton" class="flex items-center">
-            <span>Language</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-          <div class="dropdown-content" id="languageDropdown">
-            <a href="#" data-lang="en">English</a>
-            <a href="#" data-lang="ig">Igbo</a>
-            <a href="#" data-lang="yo">Yoruba</a>
-            <a href="#" data-lang="ha">Hausa</a>
-          </div>
-        </div>
+        <!-- Language Dropdown -->
+        <select
+          id="languageDropdown"
+          class="bg-gray-100 text-black p-2 rounded-md"
+          onchange="changeLanguage()"
+        >
+          <option value="en" selected>English</option>
+          <option value="ha">Hausa</option>
+          <option value="ig">Igbo</option>
+          <option value="yo">Yoruba</option>
+        </select>
       </div>
     </nav>
-    <div id="google_translate_element"></div>
 
     <main class="container mx-auto px-4 py-8">
       <div id="userDetails" class="text-center mb-8 flex items-center">
@@ -199,17 +119,19 @@
           class="w-20 h-20 rounded-full"
         />
         <div class="ml-4 flex flex-col items-start">
-          <span class="text-2xl font-bold agrovest-text-green"
+          <span class="text-2xl font-bold agrovest-text-green" data-translate
             >Hi, Loading...</span
           >
-          <h3 id="greeting" class="text-2xl font-medium"></h3>
+          <h3 id="greeting" class="text-2xl font-medium" data-translate></h3>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div id="todayWeather" class="bg-white p-4 rounded-lg shadow-md">
           <div class="flex justify-between items-center mb-2">
-            <h4 class="text-lg font-medium" id="todayDate">Today</h4>
+            <h4 class="text-lg font-medium" id="todayDate" data-translate>
+              Today
+            </h4>
             <img
               id="todayWeatherIcon"
               src=""
@@ -228,18 +150,18 @@
           <img src="images/icons8-plant-96.png" alt="Plant Icon" />
         </div>
         <div class="text">
-          <h4><span>10</span>% Germination</h4>
-          <p>Current Plant Season: Rainy Season</p>
+          <h4 data-translate><span data-translate>10</span>% Germination</h4>
+          <p data-translate>Current Plant Season: Rainy Season</p>
         </div>
       </div>
 
       <div class="bg-blue-200 p-4 rounded-lg shadow-md mt-8">
-        <h3 class="text-xl font-bold mb-4">Daily Farm Advice</h3>
+        <h3 class="text-xl font-bold mb-4" data-translate>Daily Farm Advice</h3>
         <div class="flex items-start">
           <img src="images/red.png" alt="Farmer Icon" class="w-10 h-10 mt-1" />
-          <div class="ml-4 ai-advice" id="aiAdviceContent">
+          <div class="ml-4 ai-advice" id="aiAdviceContent" data-translate>
             <!-- AI-generated content will be inserted here -->
-            <p class="text-gray-600">Loading advice...</p>
+            <p class="text-gray-600" data-translate>Loading advice...</p>
           </div>
         </div>
       </div>
@@ -247,9 +169,9 @@
       <div class="bg-blue-200 p-4 rounded-lg shadow-md mt-8">
         <div class="flex items-center mb-4">
           <img src="images/red.png" alt="Farmer Icon" class="w-10 h-10" />
-          <div class="ml-4 ai-advice" id="aiAdviceContent2">
+          <div class="ml-4 ai-advice" id="aiAdviceContent2" data-translate>
             <!-- AI-generated content will be inserted here -->
-            <p class="text-gray-600">Loading advice...</p>
+            <p class="text-gray-600" data-translate>Loading advice...</p>
           </div>
         </div>
       </div>
@@ -262,67 +184,58 @@
         }
       }
     </script>
+
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const languageButton = document.getElementById("languageButton");
-        const languageDropdown = document.getElementById("languageDropdown");
+      // Initialize Google Translate API (ensure you replace YOUR_API_KEY with your actual API key)
+      const apiKey = "AIzaSyDvfbOGtOCXOlHex6Yn1aAMAR5VVDuwCnA"; // Replace with your API key
+      const apiUrl = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
 
-        // Toggle dropdown when clicking the button
-        languageButton.addEventListener("click", (e) => {
-          e.stopPropagation();
-          languageDropdown.classList.toggle("show");
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener("click", (e) => {
-          if (
-            !languageDropdown.contains(e.target) &&
-            !languageButton.contains(e.target)
-          ) {
-            languageDropdown.classList.remove("show");
-          }
-        });
-
-        // Handle language selection
-        const languageLinks = document.querySelectorAll(
-          ".language-dropdown .dropdown-content a"
-        );
-        languageLinks.forEach((link) => {
-          link.addEventListener("click", (e) => {
-            e.preventDefault();
-            const selectedLang = link.dataset.lang;
-            console.log("Selected language:", selectedLang);
-            languageDropdown.classList.remove("show");
-
-            // Trigger Google Translate
-            const googleFrame = document.querySelector(".goog-te-combo");
-            if (googleFrame) {
-              googleFrame.value = selectedLang;
-              googleFrame.dispatchEvent(new Event("change"));
-            }
+      // Function to call Google Translate API and return translated text
+      async function translateText(text, targetLanguage) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              q: text,
+              target: targetLanguage,
+              format: "text", // Specify the format of the text
+            }),
           });
-        });
-      });
 
-      function googleTranslateElementInit() {
-        new google.translate.TranslateElement(
-          {
-            pageLanguage: "en",
-            includedLanguages: "en,ig,yo,ha",
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false,
-            multilingualPage: true,
-          },
-          "google_translate_element"
-        );
+          if (!response.ok) {
+            throw new Error("Translation API error: " + response.statusText);
+          }
+
+          const data = await response.json();
+          return data.data.translations[0].translatedText;
+        } catch (error) {
+          console.error("Error translating text:", error);
+          return text; // Fallback to original text if translation fails
+        }
       }
 
-      // Load Google Translate script
-      const translateScript = document.createElement("script");
-      translateScript.src =
-        "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      document.body.appendChild(translateScript);
+      // Function to handle language change
+      async function changeLanguage() {
+        const language = document.getElementById("languageDropdown").value;
+
+        // Find all elements with the `data-translate` attribute
+        const textElements = document.querySelectorAll("[data-translate]");
+        for (const elem of textElements) {
+          const originalText = elem.innerText || elem.textContent;
+          const translatedText = await translateText(originalText, language);
+          elem.innerText = translatedText; // Update the text content with translated text
+        }
+      }
+
+      // Automatically translate the page when loaded
+      window.addEventListener("DOMContentLoaded", () => {
+        changeLanguage();
+      });
     </script>
+
     <script type="module">
       // Import Firebase modules
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
