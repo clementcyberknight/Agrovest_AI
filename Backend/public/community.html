@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timmy - Agrovest</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Roboto", sans-serif;
+      }
+
+      body,
+      html {
+        height: 100%;
+        background-color: #dcdce7;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background-color: #1b472a;
+        padding: 10px 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        height: 90px; /* Fixed height for header */
+      }
+
+      header .logo img {
+        height: 70px;
+      }
+
+      /* Main content area */
+      .main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        margin-top: 90px; /* Match header height */
+        margin-bottom: 80px; /* Space for search box */
+        position: relative;
+        height: calc(100vh - 170px); /* Subtract header and search box height */
+        overflow-y: auto;
+      }
+
+      .chat-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom: 20px;
+      }
+
+      header nav a {
+        color: #e8d88f;
+        font-size: 18px;
+        text-decoration: none;
+        padding: 5px;
+        margin-left: 15px;
+        transition: color 0.3s;
+      }
+
+      header nav a:hover {
+        color: #fff;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      @media (min-width: 600px) {
+        .nav ul {
+          padding: 10px;
+        }
+      }
+
+      .nav li {
+        margin-right: 40px;
+      }
+
+      .nav a {
+        font-family: "Roboto", sans-serif;
+        color: #fff;
+        font-size: 18px;
+        transition: color 0.3s ease;
+        text-decoration: none;
+        position: relative;
+      }
+
+      .nav a::after {
+        content: "";
+        width: 0;
+        height: 2px;
+        background-color: #28a745;
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        transition: width 0.3s;
+      }
+
+      .nav a:hover::after {
+        width: 100%;
+      }
+
+      .nav a:hover {
+        color: #28a745;
+      }
+
+      .markdown {
+        line-height: 1.6;
+        font-size: 16px;
+      }
+
+      .markdown h2 {
+        font-size: 1.5em;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .markdown ul {
+        margin-left: 20px;
+        list-style-type: disc;
+      }
+
+      .markdown li {
+        margin-bottom: 5px;
+      }
+
+      .markdown strong {
+        font-weight: bold;
+      }
+
+      .markdown em {
+        font-style: italic;
+      }
+
+      .markdown div {
+        margin-bottom: 10px;
+      }
+
+      .search-box {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #ffffff;
+        padding: 15px 20px;
+        border-radius: 25px;
+        margin: 10px 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .search-box textarea {
+        flex: 1;
+        border: none;
+        background: none;
+        margin-left: 10px;
+        outline: none;
+        font-size: 17px;
+        resize: none;
+        height: 30px;
+        overflow: hidden;
+        transition: height 0.2s ease;
+      }
+
+      .search-box img {
+        width: 24px;
+        cursor: pointer;
+      }
+
+      .message {
+        margin: 10px 5px;
+        padding: 15px;
+        border-radius: 10px;
+        color: white;
+        max-width: 80%;
+      }
+
+      .user-message {
+        background-color: #2196f3;
+        text-align: right;
+        margin-left: auto;
+      }
+
+      .ai-response {
+        background-color: #47a075;
+        text-align: left;
+        margin-right: auto;
+      }
+
+      .skeleton-loading {
+        display: none;
+      }
+
+      .skeleton-loading.active {
+        display: block;
+      }
+
+      .skeleton-loading .message {
+        background-color: #a1a1a1;
+        /* Gray background */
+        animation: pulse 1.5s infinite;
+        /* Animation */
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+
+        50% {
+          opacity: 0.9;
+        }
+
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      .message-label {
+        font-size: 10px;
+        opacity: 0.8;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: auto;
+        padding: 5px;
+        font-size: 14px;
+      }
+
+      .footer a {
+        color: #4a90e2;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .settings-icon {
+        border: none;
+        background: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .settings-icon img {
+        height: 24px;
+        cursor: pointer;
+        transition: transform 0.5s;
+      }
+
+      .rotate {
+        animation: rotate360 0.5s;
+      }
+
+      @keyframes rotate360 {
+        from {
+          transform: rotate(0deg);
+        }
+
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .settings-menu {
+        display: none;
+        position: absolute;
+        right: 50px;
+        padding: 15px;
+        top: 60px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        z-index: 1001;
+      }
+
+      .settings-menu a {
+        display: block;
+        padding: 20px 50px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .settings-menu a:hover {
+        background-color: #f0f4f8;
+      }
+
+      ::-webkit-scrollbar {
+        width: 0; /* Remove scrollbar width */
+        background: transparent; /* Optional: for older browsers */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: transparent;
+      }
+
+      /* For Firefox */
+      * {
+        scrollbar-width: none;
+      }
+      .main,
+      .chat-container {
+        -ms-overflow-style: none; /* For Internet Explorer and Edge */
+        scrollbar-width: none; /* For Firefox */
+      }
+
+      .main::-webkit-scrollbar,
+      .chat-container::-webkit-scrollbar {
+        display: none; /* For Chrome, Safari and Opera */
+      }
+      .file-preview {
+        margin-top: 10px;
+        max-width: 100%;
+        display: none;
+      }
+
+      .file-preview img {
+        max-width: 100%;
+        max-height: 200px;
+      }
+
+      .file-preview video {
+        max-width: 100%;
+        max-height: 200px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      </div>
+      <nav>
+        <a href="menu.html">Menu</a>
+      </nav>
+    </header>
+    <div class="main">
+      <div class="chat-container" id="message-area">
+        <!-- Chat messages dynamically loaded here -->
+      </div>
+      <div class="search-box">
+        <input
+          type="file"
+          id="file-input"
+          accept="image/*,video/*"
+          style="display: none"
+        />
+        <label for="file-input">
+          <img src="images/attach.png" alt="Attach File" class="attach-icon" />
+        </label>
+        <div class="file-preview" id="file-preview"></div>
+        <textarea
+          placeholder="Type your message..."
+          id="user-input"
+          rows="1"
+        ></textarea>
+        <img src="images/send.png" alt="Send Button" id="send-button" />
+      </div>
+    </div>
+
+    <script>
+      window.toggleSettingsMenu = function () {
+        const settingsMenu = document.getElementById("settingsMenu");
+        const menuIcon = document.getElementById("menuIcon");
+        const isOpen = settingsMenu.style.display === "block";
+        settingsMenu.style.display = isOpen ? "none" : "block";
+        menuIcon.classList.add("rotate");
+        setTimeout(() => menuIcon.classList.remove("rotate"), 500);
+      };
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        query,
+        orderBy,
+        onSnapshot,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+      import {
+        getStorage,
+        ref,
+        uploadBytes,
+        getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const storage = getStorage(app);
+
+      // Firestore collections
+      const messagesRef = collection(db, "messages");
+
+      let globalUserData = null;
+
+      // Fetch user data from Firestore
+      async function getUserData() {
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+          console.error("User ID not found in localStorage.");
+          return null;
+        }
+
+        try {
+          const userDocRef = doc(db, "user_data", userId);
+          const docSnap = await getDoc(userDocRef);
+
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            console.log("Fetched User Data:", userData);
+
+            // Add the userId to the user data for later use
+            userData.userId = userId;
+            return userData;
+          } else {
+            console.warn(`No user data found for userId: ${userId}`);
+            return null;
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          return null;
+        }
+      }
+
+      // Initialize the chat
+      async function initializeChat() {
+        globalUserData = await getUserData();
+
+        if (!globalUserData) {
+          console.error("Unable to load user data. Redirecting to login...");
+          return;
+        }
+
+        console.log("User logged in as:", globalUserData.fullName);
+        setupRealtimeChat();
+      }
+
+      // Handle sending messages
+      document
+        .getElementById("send-button")
+        .addEventListener("click", async () => {
+          const userInput = document.getElementById("user-input").value.trim();
+          const fileInput = document.getElementById("file-input").files[0];
+
+          if (!globalUserData) {
+            console.error("User data not available. Cannot send message.");
+            return;
+          }
+
+          let fileURL = null;
+          let fileType = null; // To store the file type (image, video, etc.)
+
+          if (fileInput) {
+            const fileExtension = fileInput.name.split(".").pop().toLowerCase();
+            const fileRef = ref(
+              storage,
+              `uploads/${Date.now()}_${fileInput.name}`
+            );
+
+            // Upload file to Firebase
+            await uploadBytes(fileRef, fileInput);
+            fileURL = await getDownloadURL(fileRef);
+
+            // Classify file type based on extension
+            if (
+              ["jpeg", "JPEG", "JPG", "jpg", "png", "gif"].includes(
+                fileExtension
+              )
+            ) {
+              fileType = "image";
+            } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
+              fileType = "video";
+            } else {
+              fileType = "media"; // For other types (audio, documents, etc.)
+            }
+          }
+
+          const message = {
+            userId: globalUserData.userId,
+            username: globalUserData.fullName,
+            city: globalUserData.city,
+            state: globalUserData.state,
+            avatar:
+              globalUserData.profilePicture || "images/default-avatar.png",
+            type: fileType || "text", // Use the classified type or default to text
+            content: fileURL || userInput,
+            timestamp: new Date().toISOString(),
+          };
+
+          console.log("Message object to be saved:", message);
+          document.getElementById("file-preview").style.display = "none";
+
+          try {
+            await addDoc(messagesRef, message);
+            console.log("Message saved successfully!");
+          } catch (error) {
+            console.error("Error saving message:", error);
+          }
+
+          // Clear inputs
+          document.getElementById("user-input").value = "";
+          document.getElementById("file-input").value = "";
+        });
+      // Handle file selection and display preview
+      document
+        .getElementById("file-input")
+        .addEventListener("change", function (event) {
+          const fileInput = event.target;
+          const previewContainer = document.getElementById("file-preview");
+
+          const file = fileInput.files[0];
+          if (!file) {
+            previewContainer.style.display = "none"; // Hide preview if no file is selected
+            return;
+          }
+
+          const fileExtension = file.name.split(".").pop().toLowerCase();
+          const reader = new FileReader();
+
+          previewContainer.innerHTML = ""; // Clear previous preview content
+
+          // Show file preview
+          if (
+            fileExtension === "jpg" ||
+            fileExtension === "jpeg" ||
+            fileExtension === "png" ||
+            fileExtension === "gif"
+          ) {
+            // If image file, show the image
+            reader.onload = function () {
+              const img = document.createElement("img");
+              img.src = reader.result;
+              previewContainer.appendChild(img);
+              previewContainer.style.display = "block";
+            };
+          } else if (
+            fileExtension === "mp4" ||
+            fileExtension === "webm" ||
+            fileExtension === "ogg"
+          ) {
+            // If video file, show the video
+            reader.onload = function () {
+              const video = document.createElement("video");
+              video.src = reader.result;
+              video.controls = true;
+              previewContainer.appendChild(video);
+              previewContainer.style.display = "block";
+            };
+          } else {
+            // For other file types, show a download link
+            previewContainer.innerHTML = `<a href="${URL.createObjectURL(
+              file
+            )}" target="_blank">Download File</a>`;
+            previewContainer.style.display = "block";
+          }
+
+          reader.readAsDataURL(file); // Read file as a data URL
+        });
+
+      // Set up real-time message listener
+      function setupRealtimeChat() {
+        const q = query(messagesRef, orderBy("timestamp", "asc"));
+        const messageArea = document.getElementById("message-area");
+
+        onSnapshot(q, (snapshot) => {
+          messageArea.innerHTML = ""; // Clear previous messages
+
+          snapshot.forEach((doc) => {
+            const message = doc.data();
+
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add(
+              "message",
+              message.userId === globalUserData.userId
+                ? "user-message"
+                : "ai-response"
+            );
+
+            // User details (for display purposes)
+            const titles = "farmer";
+            const userDetails = document.createElement("div");
+            userDetails.classList.add("user-details");
+            userDetails.innerHTML = `
+  <span class="username" style=" display: block; margin-bottom: 6px;">${message.username}</span>
+`;
+
+            // Message content
+            const messageContent = document.createElement("div");
+            if (message.type === "text") {
+              messageContent.textContent = message.content;
+            } else if (message.type === "image") {
+              const img = document.createElement("img");
+              img.src = message.content;
+              img.alt = "Sent image";
+              img.style.maxWidth = "100%";
+              messageContent.appendChild(img);
+            } else if (message.type === "video") {
+              const video = document.createElement("video");
+              video.src = message.content;
+              video.controls = true;
+              video.style.maxWidth = "100%";
+              messageContent.appendChild(video);
+            } else {
+              const media = document.createElement("a");
+              media.href = message.content;
+              media.target = "_blank";
+              media.textContent = "Download Media";
+              messageContent.appendChild(media);
+            }
+
+            messageDiv.appendChild(userDetails);
+            messageDiv.appendChild(messageContent);
+            messageArea.appendChild(messageDiv);
+          });
+
+          messageArea.scrollTop = messageArea.scrollHeight;
+        });
+      }
+
+      initializeChat();
+    </script>
+  </body>
+</html>
