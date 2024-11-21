@@ -508,8 +508,11 @@
             return;
           }
 
+          // Only proceed if there's either text or a file
+          if (!userInput && !fileInput) return;
+
           let fileURL = null;
-          let fileType = null; // To store the file type (image, video, etc.)
+          let fileType = null;
 
           if (fileInput) {
             const fileExtension = fileInput.name.split(".").pop().toLowerCase();
@@ -518,11 +521,9 @@
               `uploads/${Date.now()}_${fileInput.name}`
             );
 
-            // Upload file to Firebase
             await uploadBytes(fileRef, fileInput);
             fileURL = await getDownloadURL(fileRef);
 
-            // Classify file type based on extension
             if (
               ["jpeg", "JPEG", "JPG", "jpg", "png", "gif"].includes(
                 fileExtension
@@ -532,7 +533,7 @@
             } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
               fileType = "video";
             } else {
-              fileType = "media"; // For other types (audio, documents, etc.)
+              fileType = "media";
             }
           }
 
@@ -543,8 +544,10 @@
             state: globalUserData.state,
             avatar:
               globalUserData.profilePicture || "images/default-avatar.png",
-            type: fileType || "text", // Use the classified type or default to text
-            content: fileURL || userInput,
+            type: fileInput ? "mixed" : "text", // New type for combined content
+            text: userInput, // Store text separately
+            mediaUrl: fileURL, // Store media URL separately
+            mediaType: fileType, // Store media type
             timestamp: new Date().toISOString(),
           };
 
@@ -624,7 +627,7 @@
         const messageArea = document.getElementById("message-area");
 
         onSnapshot(q, (snapshot) => {
-          messageArea.innerHTML = ""; // Clear previous messages
+          messageArea.innerHTML = "";
 
           snapshot.forEach((doc) => {
             const message = doc.data();
@@ -637,36 +640,45 @@
                 : "ai-response"
             );
 
-            // User details (for display purposes)
-            const titles = "farmer";
+            // User details
             const userDetails = document.createElement("div");
             userDetails.classList.add("user-details");
             userDetails.innerHTML = `
-  <span class="username" style=" display: block; margin-bottom: 6px;">${message.username}</span>
-`;
+              <span class="username" style="display: block; margin-bottom: 6px;">${message.username}</span>
+            `;
 
             // Message content
             const messageContent = document.createElement("div");
-            if (message.type === "text") {
-              messageContent.textContent = message.content;
-            } else if (message.type === "image") {
-              const img = document.createElement("img");
-              img.src = message.content;
-              img.alt = "Sent image";
-              img.style.maxWidth = "100%";
-              messageContent.appendChild(img);
-            } else if (message.type === "video") {
-              const video = document.createElement("video");
-              video.src = message.content;
-              video.controls = true;
-              video.style.maxWidth = "100%";
-              messageContent.appendChild(video);
-            } else {
-              const media = document.createElement("a");
-              media.href = message.content;
-              media.target = "_blank";
-              media.textContent = "Download Media";
-              messageContent.appendChild(media);
+
+            // Add text content if it exists
+            if (message.text) {
+              const textDiv = document.createElement("div");
+              textDiv.textContent = message.text;
+              textDiv.style.marginBottom = "10px";
+              messageContent.appendChild(textDiv);
+            }
+
+            // Add media content if it exists
+            if (message.mediaUrl) {
+              if (message.mediaType === "image") {
+                const img = document.createElement("img");
+                img.src = message.mediaUrl;
+                img.alt = "Sent image";
+                img.style.maxWidth = "100%";
+                messageContent.appendChild(img);
+              } else if (message.mediaType === "video") {
+                const video = document.createElement("video");
+                video.src = message.mediaUrl;
+                video.controls = true;
+                video.style.maxWidth = "100%";
+                messageContent.appendChild(video);
+              } else {
+                const media = document.createElement("a");
+                media.href = message.mediaUrl;
+                media.target = "_blank";
+                media.textContent = "Download Media";
+                messageContent.appendChild(media);
+              }
             }
 
             messageDiv.appendChild(userDetails);
