@@ -374,6 +374,12 @@
         <div class="message markdown"></div>
       </div>
       <div class="search-box">
+        <img
+          src="images/mic.png"
+          alt="Microphone"
+          class="mic-button"
+          style="margin-right: 10px"
+        />
         <textarea
           placeholder="Enter Prompt Here"
           id="user-input"
@@ -614,6 +620,12 @@
         this.style.height = "auto";
         this.style.height = this.scrollHeight + "px";
       });
+
+      document
+        .querySelector(".mic-button")
+        .addEventListener("click", function () {
+          window.location.href = "clem.html";
+        });
     </script>
   </body>
 </html>

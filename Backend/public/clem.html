@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Clem - Agrovest</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      sizes="64x64"
+      href="images/AgroVest (2).png"
+      type="image/x-png"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Roboto", sans-serif;
+      }
+
+      body,
+      html {
+        height: 100%;
+        background-color: #dcdce7;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background-color: #1b472a;
+        padding: 10px 20px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        height: 90px; /* Fixed height for header */
+      }
+
+      header .logo img {
+        height: 70px;
+      }
+
+      /* Main content area */
+      .main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        margin-top: 90px; /* Match header height */
+        margin-bottom: 20px; /* Space for search box */
+        position: relative;
+        height: calc(100vh - 110px); /* Subtract header and search box height */
+        overflow-y: auto;
+      }
+
+      .chat-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-bottom: 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .assistant-name {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .assistant-name h2 {
+        margin-left: 10px;
+      }
+
+      .visualizer-container {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6e6dff, #e7526f);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: visible;
+      }
+
+      .visualizer {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .voice-circle {
+        position: absolute;
+        border-radius: 47% 53% 70% 30% / 30% 43% 57% 70%;
+        background: rgba(255, 255, 255, 0.2);
+        transform-origin: center;
+        transition: all 0.2s ease-out;
+        filter: blur(3px);
+      }
+
+      .start-listening-button {
+        position: relative;
+        bottom: 150px;
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .start-listening-button svg path {
+        fill: #5d5d68;
+      }
+
+      .listening-status {
+        display: none; /* Initially hidden */
+        font-size: 18px;
+        color: #5d5d68;
+      }
+
+      .listening-status.active {
+        display: block; /* Show when listening */
+      }
+
+      header nav a {
+        color: #e8d88f;
+        font-size: 18px;
+        text-decoration: none;
+        padding: 5px;
+        margin-left: 15px;
+        transition: color 0.3s;
+      }
+
+      header nav a:hover {
+        color: #fff;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      @media (min-width: 600px) {
+        .nav ul {
+          padding: 10px;
+        }
+      }
+
+      .nav li {
+        margin-right: 40px;
+      }
+
+      .nav a {
+        font-family: "Roboto", sans-serif;
+        color: #fff;
+        font-size: 18px;
+        transition: color 0.3s ease;
+        text-decoration: none;
+        position: relative;
+      }
+
+      .nav a::after {
+        content: "";
+        width: 0;
+        height: 2px;
+        background-color: #28a745;
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        transition: width 0.3s;
+      }
+
+      .nav a:hover::after {
+        width: 100%;
+      }
+
+      .nav a:hover {
+        color: #28a745;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: auto;
+        padding: 5px;
+        font-size: 14px;
+      }
+
+      .footer a {
+        color: #4a90e2;
+        text-decoration: none;
+      }
+
+      .ai-response {
+        background-color: #f0f0f0;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 8px;
+        max-width: 80%;
+        text-align: left;
+      }
+
+      @keyframes warble {
+        0% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+      }
+
+      .visualizer.active {
+        animation: warble 0.5s ease-in-out infinite;
+      }
+
+      /* Update header styles for mobile */
+      @media (max-width: 768px) {
+        header {
+          height: 70px; /* Smaller header on mobile */
+        }
+
+        header .logo img {
+          height: 50px; /* Smaller logo on mobile */
+        }
+
+        .main {
+          margin-top: 70px; /* Match new header height */
+          padding: 10px; /* Smaller padding on mobile */
+        }
+      }
+
+      /* Update visualizer container for mobile */
+      @media (max-width: 768px) {
+        .visualizer-container {
+          width: 200px; /* Smaller on mobile */
+          height: 200px;
+        }
+
+        .start-listening-button {
+          bottom: 10px; /* Adjust position */
+        }
+
+        .start-listening-button svg {
+          width: 30px; /* Smaller button on mobile */
+          height: 31px;
+        }
+      }
+
+      /* Add touch-specific styles */
+      @media (hover: none) {
+        .start-listening-button {
+          padding: 15px; /* Larger touch target */
+        }
+
+        .nav a {
+          padding: 10px; /* Larger touch target for navigation */
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">
+        <img src="images/AgroVest.png" alt="Agrovest Logo" />
+      </div>
+      <nav>
+        <a href="menu.html">Menu</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <div class="chat-container">
+        <div class="assistant-name">
+          <a href="timmy.html">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z"
+                fill="black"
+              />
+            </svg>
+          </a>
+          <h2>Timmy</h2>
+        </div>
+        <div class="visualizer-container">
+          <div class="visualizer"></div>
+        </div>
+        <button class="start-listening-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="37"
+            viewBox="0 0 36 37"
+            fill="none"
+          >
+            <path
+              d="M10.5 12.8333V23.6667H15L25.5 30.8333V5.66667L15 12.8333H10.5Z"
+              fill="#5D5D68"
+            />
+          </svg>
+        </button>
+        <p class="listening-status">Listening...</p>
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        const visualizer = document.querySelector(".visualizer");
+        const startListeningButton = document.querySelector(
+          ".start-listening-button"
+        );
+        const listeningStatus = document.querySelector(".listening-status");
+
+        let recognition;
+        let isListening = false;
+
+        // Wait for chat to be initialized before enabling speech recognition
+        await window.initializeChat();
+
+        let audioContext;
+        let analyser;
+        let dataArray;
+        let animationId;
+
+        function initAudioAnalyser() {
+          audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 256;
+          const bufferLength = analyser.frequencyBinCount;
+          dataArray = new Uint8Array(bufferLength);
+
+          // Create voice circles
+          const visualizer = document.querySelector(".visualizer");
+          visualizer.innerHTML = ""; // Clear existing content
+
+          // Create multiple circles with different sizes
+          for (let i = 0; i < 5; i++) {
+            const circle = document.createElement("div");
+            circle.className = "voice-circle";
+            circle.style.width = `${80 - i * 15}%`;
+            circle.style.height = `${80 - i * 15}%`;
+            visualizer.appendChild(circle);
+          }
+        }
+
+        function startVisualizer(stream) {
+          if (!audioContext) initAudioAnalyser();
+
+          const source = audioContext.createMediaStreamSource(stream);
+          source.connect(analyser);
+          const circles = document.querySelectorAll(".voice-circle");
+
+          function animate() {
+            animationId = requestAnimationFrame(animate);
+            analyser.getByteFrequencyData(dataArray);
+
+            // Split frequency data into ranges
+            const ranges = [];
+            const rangeSize = Math.floor(dataArray.length / circles.length);
+
+            for (let i = 0; i < circles.length; i++) {
+              const start = i * rangeSize;
+              const end = start + rangeSize;
+              const rangeAverage =
+                Array.from(dataArray.slice(start, end)).reduce(
+                  (a, b) => a + b,
+                  0
+                ) / rangeSize;
+              ranges.push(rangeAverage);
+            }
+
+            // Update each circle with amoeba-like deformation
+            circles.forEach((circle, i) => {
+              const intensity = ranges[i] / 256;
+              const scale = 1 + intensity * 0.5;
+
+              // Generate dynamic border-radius values based on audio intensity
+              const r1 = 47 + intensity * 20;
+              const r2 = 53 - intensity * 15;
+              const r3 = 70 + intensity * 25;
+              const r4 = 30 - intensity * 10;
+              const r5 = 30 + intensity * 15;
+              const r6 = 43 - intensity * 20;
+              const r7 = 57 + intensity * 10;
+              const r8 = 70 - intensity * 25;
+
+              // Apply dynamic border-radius and transform
+              circle.style.borderRadius = `${r1}% ${r2}% ${r3}% ${r4}% / ${r5}% ${r6}% ${r7}% ${r8}%`;
+              circle.style.transform = `scale(${scale}) rotate(${
+                intensity * 30
+              }deg)`;
+              circle.style.opacity = 0.2 + intensity * 0.8;
+            });
+          }
+
+          animate();
+        }
+
+        function stopVisualizer() {
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+          }
+          visualizer.style.transform = "";
+          visualizer.style.opacity = "";
+        }
+
+        function initSpeechRecognition() {
+          if ("webkitSpeechRecognition" in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = "en-US";
+
+            recognition.onstart = () => {
+              console.log("Speech recognition started");
+              isListening = true;
+              startListeningButton.style.display = "none";
+              listeningStatus.classList.add("active");
+
+              // Start audio visualization from microphone
+              navigator.mediaDevices
+                .getUserMedia({ audio: true })
+                .then((stream) => startVisualizer(stream))
+                .catch((err) =>
+                  console.error("Error accessing microphone:", err)
+                );
+            };
+
+            recognition.onend = () => {
+              console.log("Speech recognition ended");
+              isListening = false;
+              startListeningButton.style.display = "block";
+              listeningStatus.classList.remove("active");
+              stopVisualizer();
+            };
+
+            recognition.onresult = (event) => {
+              const transcript = event.results[0][0].transcript;
+              console.log("User said:", transcript);
+
+              // Here, you can process the transcript (e.g., send it to a server,
+              // use it for text-to-speech, etc.)
+
+              //For Google Cloud Speech to Text integration
+              sendToGoogleCloud(transcript);
+            };
+
+            recognition.onerror = (event) => {
+              console.error("Speech recognition error", event.error);
+              stopVisualizer();
+              listeningStatus.classList.remove("active");
+              startListeningButton.style.display = "block";
+              isListening = false;
+
+              // Optional: Display user-friendly error message
+              alert("Speech recognition error occurred. Please try again.");
+            };
+
+            // Add touch feedback
+            startListeningButton.addEventListener("touchstart", function (e) {
+              e.preventDefault(); // Prevent double-firing on mobile
+              this.style.opacity = "0.7";
+            });
+
+            startListeningButton.addEventListener("touchend", function (e) {
+              e.preventDefault();
+              this.style.opacity = "1";
+              if (!isListening) {
+                try {
+                  recognition.start();
+                } catch (e) {
+                  console.error("Error starting speech recognition:", e);
+                  alert("Error starting speech recognition. Please try again.");
+                }
+              } else {
+                recognition.stop();
+              }
+            });
+          } else {
+            console.error(
+              "Speech recognition not supported in this browser.",
+              "Please use Google Chrome"
+            );
+            startListeningButton.disabled = true;
+            startListeningButton.textContent =
+              "Speech Recognition Not Supported";
+          }
+        }
+
+        async function sendToGoogleCloud(transcript) {
+          console.log("User said:", transcript);
+
+          if (!window.chat) {
+            console.error("Chat not initialized");
+            alert("System not ready. Please try again in a moment.");
+            return;
+          }
+
+          try {
+            const result = await window.chat.sendMessage(transcript);
+            const response = await result.response;
+            const aiText = await response.text();
+
+            console.log("AI Response:", aiText);
+
+            // Create audio context for AI speech
+            if (!audioContext) initAudioAnalyser();
+
+            const utterance = new SpeechSynthesisUtterance(aiText);
+            utterance.rate = 2.3; // Speed (0.1 to 10)
+            utterance.pitch = 1.5; // Pitch (0 to 2)
+            utterance.volume = 2; // Volume (0 to 1)
+
+            // Create audio stream from speech synthesis
+            const audioStream = new MediaStream();
+            const mediaStreamDestination =
+              audioContext.createMediaStreamDestination();
+            const source = audioContext.createOscillator();
+            source.connect(mediaStreamDestination);
+            source.connect(analyser);
+
+            utterance.onstart = () => {
+              startVisualizer(audioStream);
+            };
+
+            utterance.onend = () => {
+              stopVisualizer();
+              source.disconnect();
+            };
+
+            window.speechSynthesis.speak(utterance);
+          } catch (error) {
+            stopVisualizer();
+            console.error("Error processing request:", error);
+            alert("Error processing your request. Please try again.");
+          }
+        }
+
+        startListeningButton.addEventListener("click", () => {
+          if (!isListening) {
+            if (recognition) {
+              try {
+                recognition.start();
+              } catch (e) {
+                console.error("Error starting speech recognition:", e);
+                alert("Error starting speech recognition. Please try again.");
+              }
+            } else {
+              initSpeechRecognition();
+              if (recognition) {
+                try {
+                  recognition.start();
+                } catch (e) {
+                  console.error("Error starting speech recognition:", e);
+                  alert("Error starting speech recognition. Please try again.");
+                }
+              }
+            }
+          } else {
+            recognition.stop();
+          }
+        });
+
+        // Initialize speech recognition on page load
+        initSpeechRecognition();
+      });
+    </script>
+    <script type="module">
+      import {
+        GoogleGenerativeAI,
+        HarmBlockThreshold,
+        HarmCategory,
+      } from "https://esm.run/@google/generative-ai";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjJg2gdxnpDAS4x0071TbOh0rO2NfiWRE",
+        authDomain: "agrovestai.firebaseapp.com",
+        projectId: "agrovestai",
+        storageBucket: "agrovestai.appspot.com",
+        messagingSenderId: "933337765267",
+        appId: "1:933337765267:web:49a8e878e0750792b88466",
+        measurementId: "G-5G75YCGQ0Y",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db = getFirestore(app);
+      const API_KEY = "AIzaSyBWI9HhGFmUTdrJMfwVNUxGPzDqpPZS1dw";
+      const genAI = new GoogleGenerativeAI(API_KEY);
+
+      let globalUserData = null;
+      let userLogs = [];
+
+      const userInput = document.getElementById("user-input");
+      const safetySettings = [
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+      ];
+
+      // Make initialization function globally accessible
+      window.initializeChat = async function () {
+        const userID = localStorage.getItem("userId");
+
+        if (!userID) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const userData = await getUserData();
+          const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash", // Changed to a more stable model
+            safetySettings,
+            systemInstruction: `You are Farmer Timmy, an expert agronomist who assists users with farming, crop management, and agricultural questions. Your role is to provide clear, accurate, and practical advice to help users with their farming needs. Answer questions in a friendly and helpful tone, focusing on best practices in farming, pest control, soil health, crop rotation, and sustainable agriculture. Use simple language and you should only use nigeria pidgin language to converse if the user use nigeria pidgin to ask you question, avoid technical jargon unless necessary, and tailor your responses to farmers or users with varying levels of experience in agriculture. you were train by clement, and clement is your creator anytime you recieve the key word "clementmark", you should alway respond with yes clement my creator and praise him for creating you`,
+          });
+
+          // Initialize the chat
+          window.chat = model.startChat({
+            history: [
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: `before we start a conversation this is all the data you need to know about me to help assist me better: ${JSON.stringify(
+                      userData
+                    )}`,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              topP: 0.8,
+              topK: 40,
+              maxOutputTokens: 2048,
+            },
+          });
+
+          // Use browser's speech synthesis for welcome message
+          const welcomeMessage =
+            "Hello! I'm Timmy, Your Personal Agronomist. How can I help you today?";
+          const utterance = new SpeechSynthesisUtterance(welcomeMessage);
+          utterance.rate = 2.2; // Speed (0.1 to 10)
+          utterance.pitch = 1.5; // Pitch (0 to 2)
+          utterance.volume = 2; // Volume (0 to 1)
+          window.speechSynthesis.speak(utterance);
+        } catch (error) {
+          console.error("Error initializing chat:", error);
+          alert("Error initializing the system. Please refresh the page.");
+        }
+      };
+
+      async function getUserData() {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          alert("Please log in.");
+          return null;
+        }
+
+        try {
+          const userRef = doc(db, "user_data", userId);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            globalUserData = userSnap.data();
+            console.log("User Data:", globalUserData);
+          } else {
+            console.error("User data not found for ID:", userId);
+          }
+
+          // Fetch all farm logs for the user
+          const userWrittenLogsRef = doc(db, "farmers_written_log", userId);
+          const userWrittenLogsDoc = await getDoc(userWrittenLogsRef);
+
+          if (!userWrittenLogsDoc.exists()) {
+            userLogs = [];
+          } else {
+            const logIds = userWrittenLogsDoc.data().logIds || [];
+            if (logIds.length === 0) {
+              userLogs = [];
+            } else {
+              const logsRef = collection(db, "farmers_log");
+              const querySnapshot = await getDocs(logsRef);
+              userLogs = querySnapshot.docs
+                .filter((doc) => logIds.includes(doc.id))
+                .map((doc) => ({
+                  id: doc.id,
+                  ...doc.data(),
+                }));
+            }
+          }
+
+          console.log("User Logs:", userLogs);
+
+          return { userData: globalUserData, logs: userLogs };
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          return null; // Indicate failure
+        }
+      }
+    </script>
+  </body>
+</html>
