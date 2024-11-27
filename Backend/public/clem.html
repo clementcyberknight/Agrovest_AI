@@ -353,253 +353,157 @@
         // Wait for chat to be initialized before enabling speech recognition
         await window.initializeChat();
 
-        let audioContext;
-        let analyser;
-        let dataArray;
-        let animationId;
-
-        function initAudioAnalyser() {
-          audioContext = new (window.AudioContext ||
-            window.webkitAudioContext)();
-          analyser = audioContext.createAnalyser();
-          analyser.fftSize = 256;
-          const bufferLength = analyser.frequencyBinCount;
-          dataArray = new Uint8Array(bufferLength);
-
-          // Create voice circles
-          const visualizer = document.querySelector(".visualizer");
-          visualizer.innerHTML = ""; // Clear existing content
-
-          // Create multiple circles with different sizes
-          for (let i = 0; i < 5; i++) {
-            const circle = document.createElement("div");
-            circle.className = "voice-circle";
-            circle.style.width = `${80 - i * 15}%`;
-            circle.style.height = `${80 - i * 15}%`;
-            visualizer.appendChild(circle);
-          }
+        // Add this function before speakText
+        function cleanTextForSpeech(text) {
+          return text
+            .replace(/[^\w\s.,!?-]/g, "") // Remove special characters except basic punctuation
+            .replace(/\s+/g, " ") // Replace multiple spaces with single space
+            .trim();
         }
 
-        function startVisualizer(stream) {
-          if (!audioContext) initAudioAnalyser();
-
-          const source = audioContext.createMediaStreamSource(stream);
-          source.connect(analyser);
-          const circles = document.querySelectorAll(".voice-circle");
-
-          function animate() {
-            animationId = requestAnimationFrame(animate);
-            analyser.getByteFrequencyData(dataArray);
-
-            // Split frequency data into ranges
-            const ranges = [];
-            const rangeSize = Math.floor(dataArray.length / circles.length);
-
-            for (let i = 0; i < circles.length; i++) {
-              const start = i * rangeSize;
-              const end = start + rangeSize;
-              const rangeAverage =
-                Array.from(dataArray.slice(start, end)).reduce(
-                  (a, b) => a + b,
-                  0
-                ) / rangeSize;
-              ranges.push(rangeAverage);
-            }
-
-            // Update each circle with amoeba-like deformation
-            circles.forEach((circle, i) => {
-              const intensity = ranges[i] / 256;
-              const scale = 1 + intensity * 0.5;
-
-              // Generate dynamic border-radius values based on audio intensity
-              const r1 = 47 + intensity * 20;
-              const r2 = 53 - intensity * 15;
-              const r3 = 70 + intensity * 25;
-              const r4 = 30 - intensity * 10;
-              const r5 = 30 + intensity * 15;
-              const r6 = 43 - intensity * 20;
-              const r7 = 57 + intensity * 10;
-              const r8 = 70 - intensity * 25;
-
-              // Apply dynamic border-radius and transform
-              circle.style.borderRadius = `${r1}% ${r2}% ${r3}% ${r4}% / ${r5}% ${r6}% ${r7}% ${r8}%`;
-              circle.style.transform = `scale(${scale}) rotate(${
-                intensity * 30
-              }deg)`;
-              circle.style.opacity = 0.2 + intensity * 0.8;
-            });
-          }
-
-          animate();
-        }
-
-        function stopVisualizer() {
-          if (animationId) {
-            cancelAnimationFrame(animationId);
-          }
-          visualizer.style.transform = "";
-          visualizer.style.opacity = "";
-        }
-
-        function initSpeechRecognition() {
-          if ("webkitSpeechRecognition" in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = "en-US";
-
-            recognition.onstart = () => {
-              console.log("Speech recognition started");
-              isListening = true;
-              startListeningButton.style.display = "none";
-              listeningStatus.classList.add("active");
-
-              // Start audio visualization from microphone
-              navigator.mediaDevices
-                .getUserMedia({ audio: true })
-                .then((stream) => startVisualizer(stream))
-                .catch((err) =>
-                  console.error("Error accessing microphone:", err)
-                );
-            };
-
-            recognition.onend = () => {
-              console.log("Speech recognition ended");
-              isListening = false;
-              startListeningButton.style.display = "block";
-              listeningStatus.classList.remove("active");
-              stopVisualizer();
-            };
-
-            recognition.onresult = (event) => {
-              const transcript = event.results[0][0].transcript;
-              console.log("User said:", transcript);
-
-              // Here, you can process the transcript (e.g., send it to a server,
-              // use it for text-to-speech, etc.)
-
-              //For Google Cloud Speech to Text integration
-              sendToGoogleCloud(transcript);
-            };
-
-            recognition.onerror = (event) => {
-              console.error("Speech recognition error", event.error);
-              stopVisualizer();
-              listeningStatus.classList.remove("active");
-              startListeningButton.style.display = "block";
-              isListening = false;
-
-              // Optional: Display user-friendly error message
-              alert("Speech recognition error occurred. Please try again.");
-            };
-
-            // Add touch feedback
-            startListeningButton.addEventListener("touchstart", function (e) {
-              e.preventDefault(); // Prevent double-firing on mobile
-              this.style.opacity = "0.7";
-            });
-
-            startListeningButton.addEventListener("touchend", function (e) {
-              e.preventDefault();
-              this.style.opacity = "1";
-              if (!isListening) {
-                try {
-                  recognition.start();
-                } catch (e) {
-                  console.error("Error starting speech recognition:", e);
-                  alert("Error starting speech recognition. Please try again.");
-                }
-              } else {
-                recognition.stop();
-              }
-            });
-          } else {
-            console.error(
-              "Speech recognition not supported in this browser.",
-              "Please use Google Chrome"
-            );
-            startListeningButton.disabled = true;
-            startListeningButton.textContent =
-              "Speech Recognition Not Supported";
-          }
-        }
-
-        async function sendToGoogleCloud(transcript) {
-          console.log("User said:", transcript);
-
-          if (!window.chat) {
-            console.error("Chat not initialized");
-            alert("System not ready. Please try again in a moment.");
+        // Define the speakText function before using it
+        function speakText(text) {
+          if (text.trim() === "") {
+            console.error("Empty text provided for speech");
             return;
           }
 
-          try {
-            const result = await window.chat.sendMessage(transcript);
-            const response = await result.response;
-            const aiText = await response.text();
+          const cleanedText = cleanTextForSpeech(text);
+          console.log("Cleaned text for speech:", cleanedText);
 
-            console.log("AI Response:", aiText);
+          // Cancel any ongoing speech
+          window.speechSynthesis.cancel();
 
-            // Create audio context for AI speech
-            if (!audioContext) initAudioAnalyser();
+          const speech = new SpeechSynthesisUtterance(cleanedText);
 
-            const utterance = new SpeechSynthesisUtterance(aiText);
-            utterance.rate = 2.3; // Speed (0.1 to 10)
-            utterance.pitch = 1.5; // Pitch (0 to 2)
-            utterance.volume = 2; // Volume (0 to 1)
+          // Get available voices and select a female voice
+          const voices = window.speechSynthesis.getVoices();
+          const femaleVoice = voices.find(
+            (voice) =>
+              voice.name.toLowerCase().includes("female") &&
+              voice.lang.startsWith("en")
+          );
 
-            // Create audio stream from speech synthesis
-            const audioStream = new MediaStream();
-            const mediaStreamDestination =
-              audioContext.createMediaStreamDestination();
-            const source = audioContext.createOscillator();
-            source.connect(mediaStreamDestination);
-            source.connect(analyser);
-
-            utterance.onstart = () => {
-              startVisualizer(audioStream);
-            };
-
-            utterance.onend = () => {
-              stopVisualizer();
-              source.disconnect();
-            };
-
-            window.speechSynthesis.speak(utterance);
-          } catch (error) {
-            stopVisualizer();
-            console.error("Error processing request:", error);
-            alert("Error processing your request. Please try again.");
+          if (femaleVoice) {
+            speech.voice = femaleVoice;
           }
+
+          speech.lang = "en-US";
+          speech.pitch = 1.2; // Slightly higher pitch for more feminine voice
+          speech.rate = 0.9;
+          speech.volume = 1;
+
+          speech.onstart = () => {
+            visualizer.classList.add("active");
+          };
+
+          speech.onend = () => {
+            visualizer.classList.remove("active");
+          };
+
+          window.speechSynthesis.speak(speech);
         }
 
-        startListeningButton.addEventListener("click", () => {
-          if (!isListening) {
-            if (recognition) {
-              try {
-                recognition.start();
-              } catch (e) {
-                console.error("Error starting speech recognition:", e);
-                alert("Error starting speech recognition. Please try again.");
-              }
-            } else {
-              initSpeechRecognition();
-              if (recognition) {
-                try {
-                  recognition.start();
-                } catch (e) {
-                  console.error("Error starting speech recognition:", e);
-                  alert("Error starting speech recognition. Please try again.");
-                }
-              }
+        // Ensure speakText is defined before this point
+        window.speechSynthesis.onvoiceschanged = () => {
+          const welcomeMessage =
+            "Hello! I'm Timmy, Your Personal Agronomist. How can I help you today?";
+          speakText(welcomeMessage);
+        };
+
+        // Speech-to-Text (STT) Functionality
+        if ("webkitSpeechRecognition" in window) {
+          recognition = new webkitSpeechRecognition();
+        } else if ("SpeechRecognition" in window) {
+          recognition = new SpeechRecognition();
+        } else {
+          console.error("Speech recognition not supported");
+          alert("Sorry, your browser doesn't support speech recognition.");
+        }
+
+        if (recognition) {
+          recognition.continuous = false;
+          recognition.lang = "en-US";
+          recognition.interimResults = false;
+
+          recognition.onstart = () => {
+            console.log("Speech recognition started");
+            isListening = true;
+            startListeningButton.style.display = "none";
+            listeningStatus.classList.add("active");
+            visualizer.classList.add("active");
+          };
+
+          recognition.onend = () => {
+            console.log("Speech recognition ended");
+            isListening = false;
+            startListeningButton.style.display = "block";
+            listeningStatus.classList.remove("active");
+            visualizer.classList.remove("active");
+          };
+
+          recognition.onresult = async (event) => {
+            const transcript = event.results[0][0].transcript;
+            console.log("User said:", transcript);
+
+            try {
+              const result = await window.chat.sendMessage(transcript);
+              const response = await result.response;
+              const aiText = await response.text();
+              console.log("AI Response:", aiText);
+
+              // Speak the AI's response
+              speakText(aiText);
+            } catch (error) {
+              console.error("Error processing request:", error);
+              alert("Error processing your request. Please try again.");
             }
-          } else {
+          };
+
+          recognition.onerror = (event) => {
+            console.error("Speech recognition error", event.error);
+            visualizer.classList.remove("active");
+            listeningStatus.classList.remove("active");
+            startListeningButton.style.display = "block";
+            isListening = false;
+            alert("Speech recognition error occurred. Please try again.");
+          };
+        }
+
+        // Button event listeners
+        startListeningButton.addEventListener("click", () => {
+          if (!isListening && recognition) {
+            try {
+              recognition.start();
+            } catch (e) {
+              console.error("Error starting speech recognition:", e);
+              alert("Error starting speech recognition. Please try again.");
+            }
+          } else if (isListening) {
             recognition.stop();
           }
         });
 
-        // Initialize speech recognition on page load
-        initSpeechRecognition();
+        // Add touch support
+        startListeningButton.addEventListener("touchstart", function (e) {
+          e.preventDefault();
+          this.style.opacity = "0.7";
+        });
+
+        startListeningButton.addEventListener("touchend", function (e) {
+          e.preventDefault();
+          this.style.opacity = "1";
+          if (!isListening && recognition) {
+            try {
+              recognition.start();
+            } catch (e) {
+              console.error("Error starting speech recognition:", e);
+              alert("Error starting speech recognition. Please try again.");
+            }
+          } else if (isListening) {
+            recognition.stop();
+          }
+        });
       });
     </script>
     <script type="module">
@@ -650,11 +554,6 @@
       window.initializeChat = async function () {
         const userID = localStorage.getItem("userId");
 
-        if (!userID) {
-          window.location.href = "login.html";
-          return;
-        }
-
         try {
           const userData = await getUserData();
           const model = genAI.getGenerativeModel({
@@ -685,14 +584,18 @@
             },
           });
 
-          // Use browser's speech synthesis for welcome message
+          // Update the welcome message handling
           const welcomeMessage =
             "Hello! I'm Timmy, Your Personal Agronomist. How can I help you today?";
-          const utterance = new SpeechSynthesisUtterance(welcomeMessage);
-          utterance.rate = 2.2; // Speed (0.1 to 10)
-          utterance.pitch = 1.5; // Pitch (0 to 2)
-          utterance.volume = 2; // Volume (0 to 1)
-          window.speechSynthesis.speak(utterance);
+
+          // Wait for voices to be loaded
+          if (window.speechSynthesis.getVoices().length === 0) {
+            window.speechSynthesis.onvoiceschanged = () => {
+              speakText(welcomeMessage);
+            };
+          } else {
+            speakText(welcomeMessage);
+          }
         } catch (error) {
           console.error("Error initializing chat:", error);
           alert("Error initializing the system. Please refresh the page.");

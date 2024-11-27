@@ -3,197 +3,118 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Web Application</title>
+    <title>Speech App</title>
     <style>
-      /* Reset some default styling */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
       body {
         font-family: Arial, sans-serif;
-        line-height: 1.6;
-        background-color: #f4f4f4;
-        color: #333;
-        scroll-behavior: smooth;
-      }
-
-      /* Header styling */
-      .header {
-        background: linear-gradient(to right, #4a00e0, #8e2de2);
-        color: #fff;
-        padding: 100px 20px;
+        margin: 0;
+        padding: 0;
         text-align: center;
+        background-color: #f7f7f7;
       }
-
-      .header h1 {
-        font-size: 2.5em;
-        margin-bottom: 10px;
+      .container {
+        padding: 20px;
       }
-
-      .header p {
-        font-size: 1.2em;
-        margin-bottom: 20px;
+      textarea,
+      button {
+        width: 90%;
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1.1em;
       }
-
-      .button {
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+      }
+      button:hover {
+        background-color: #0056b3;
+        cursor: pointer;
+      }
+      .result {
+        background: #e8f5e9;
+        color: #388e3c;
+        padding: 10px;
+        margin: 20px auto;
+        border-radius: 5px;
         display: inline-block;
-        padding: 10px 20px;
-        background: #fff;
-        color: #4a00e0;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background 0.3s;
-      }
-
-      .button:hover {
-        background: #8e2de2;
-        color: #fff;
-      }
-
-      /* Navbar styling */
-      .navbar {
-        display: flex;
-        justify-content: center;
-        background-color: #333;
-        padding: 10px 0;
-      }
-
-      .navbar a {
-        color: #fff;
-        padding: 10px 20px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background 0.3s, color 0.3s;
-      }
-
-      .navbar a:hover {
-        background: #8e2de2;
-        color: #fff;
-        border-radius: 5px;
-      }
-
-      /* Section styling */
-      .section {
-        padding: 60px 20px;
-        text-align: center;
-      }
-
-      .section h2 {
-        font-size: 2em;
-        margin-bottom: 20px;
-        color: #4a00e0;
-      }
-
-      /* Feature boxes */
-      .features-container {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-      }
-
-      .feature-box {
-        background-color: #fff;
-        padding: 20px;
-        width: 250px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        border-radius: 10px;
-        transition: transform 0.3s;
-      }
-
-      .feature-box:hover {
-        transform: translateY(-10px);
-      }
-
-      .feature-box h3 {
-        font-size: 1.5em;
-        color: #8e2de2;
-        margin-bottom: 10px;
-      }
-
-      /* Contact section styling */
-      #contact a {
-        color: #4a00e0;
-        text-decoration: none;
-        font-weight: bold;
-      }
-
-      #contact a:hover {
-        text-decoration: underline;
-      }
-
-      /* Footer styling */
-      footer {
-        background-color: #333;
-        color: #fff;
-        text-align: center;
-        padding: 20px;
       }
     </style>
   </head>
   <body>
-    <header class="header">
-      <div class="container">
-        <h1>My Web Application</h1>
-        <p>Building a secure and dynamic online experience</p>
-        <a href="#features" class="button">Learn More</a>
-      </div>
-    </header>
+    <div class="container">
+      <h1>Speech-to-Text and Text-to-Speech</h1>
 
-    <nav class="navbar">
-      <a href="#features">Features</a>
-      <a href="#about">About Us</a>
-      <a href="#contact">Contact</a>
-    </nav>
+      <textarea
+        id="text-input"
+        rows="5"
+        placeholder="Type text for speech synthesis"
+      ></textarea>
+      <button id="speak-btn">Speak</button>
 
-    <section id="features" class="section">
-      <h2>Features</h2>
-      <div class="features-container">
-        <div class="feature-box">
-          <h3>Secure Design</h3>
-          <p>
-            Our application ensures your data is protected through strong
-            encryption and firewall systems.
-          </p>
-        </div>
-        <div class="feature-box">
-          <h3>Fast Performance</h3>
-          <p>
-            Enjoy a fast, smooth experience, thanks to our efficient backend
-            architecture.
-          </p>
-        </div>
-        <div class="feature-box">
-          <h3>Easy to Use</h3>
-          <p>Our intuitive design makes navigation simple for all users.</p>
-        </div>
-      </div>
-    </section>
+      <button id="listen-btn">Start Listening</button>
+      <div id="stt-result" class="result" hidden></div>
+    </div>
 
-    <section id="about" class="section">
-      <h2>About Us</h2>
-      <p>
-        Our team is dedicated to developing secure and user-friendly web
-        applications. With a focus on innovation, we aim to provide the best
-        experience for our users.
-      </p>
-    </section>
+    <script>
+      // Text-to-Speech (TTS) Functionality
+      document.getElementById("speak-btn").addEventListener("click", () => {
+        const text = document.getElementById("text-input").value;
+        if (text.trim() === "") {
+          alert("Please enter some text to speak!");
+          return;
+        }
 
-    <section id="contact" class="section">
-      <h2>Contact</h2>
-      <p>
-        Have any questions? Reach out to us at
-        <a href="mailto:info@webapp.com">info@webapp.com</a>
-      </p>
-    </section>
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = "en-US"; // Set language
+        speech.pitch = 1; // Adjust pitch
+        speech.rate = 1; // Adjust rate
+        speech.volume = 1; // Adjust volume
 
-    <footer>
-      <p>&copy; 2024 Web Application. All rights reserved.</p>
-    </footer>
+        window.speechSynthesis.speak(speech);
+      });
+
+      // Speech-to-Text (STT) Functionality
+      const listenBtn = document.getElementById("listen-btn");
+      const resultDiv = document.getElementById("stt-result");
+
+      let recognition;
+      if ("webkitSpeechRecognition" in window) {
+        recognition = new webkitSpeechRecognition(); // For Chrome
+      } else if ("SpeechRecognition" in window) {
+        recognition = new SpeechRecognition();
+      } else {
+        alert("Sorry, your browser doesn't support speech recognition.");
+      }
+
+      if (recognition) {
+        recognition.continuous = false; // Stop listening after a single result
+        recognition.lang = "en-US"; // Set language
+        recognition.interimResults = false;
+
+        listenBtn.addEventListener("click", () => {
+          recognition.start();
+          listenBtn.textContent = "Listening...";
+        });
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          resultDiv.textContent = `You said: "${transcript}"`;
+          resultDiv.hidden = false;
+          listenBtn.textContent = "Start Listening";
+        };
+
+        recognition.onerror = (event) => {
+          alert(`Error occurred in recognition: ${event.error}`);
+          listenBtn.textContent = "Start Listening";
+        };
+
+        recognition.onend = () => {
+          listenBtn.textContent = "Start Listening";
+        };
+      }
+    </script>
   </body>
 </html>
